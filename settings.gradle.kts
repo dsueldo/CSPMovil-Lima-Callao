@@ -21,3 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "CSPMovil Lima Callao"
 include(":app")
+include(":data")
+include(":domain")
+include(":presentation")
