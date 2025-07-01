@@ -52,5 +52,9 @@ class NewsListViewModel @Inject constructor(
         }
     }
 
-    fun refreshNewsList() { fetchNewsList() }
+    fun refreshNewsList() {
+        _isRefreshing.value = true
+        fetchNewsList()
+        _isRefreshing.value = false
+    }
 }

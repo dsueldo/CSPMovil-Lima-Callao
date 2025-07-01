@@ -54,5 +54,9 @@ class BenefitsListViewModel @Inject constructor(
         }
     }
 
-    fun refreshBenefitsList() { fetchBenefitsList() }
+    fun refreshBenefitsList() {
+        _isRefreshing.value = true
+        fetchBenefitsList()
+        _isRefreshing.value = false
+    }
 }

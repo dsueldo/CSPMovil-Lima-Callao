@@ -27,6 +27,9 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.I
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.payment.PaymentsViewModel
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.SwipeRefreshState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +41,7 @@ fun PaymentOneScreen(
 
     val paymentsList by viewModel.paymentsList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     if (isLoading) {
         BasicAlertDialog (
@@ -65,19 +69,32 @@ fun PaymentOneScreen(
             style = Typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
-        LazyColumn(
-            modifier = modifier
-                .background(MaterialTheme.colorScheme.background)
-                .fillMaxSize()
-        ) {
-            items(paymentsList) { paymentsItem ->
-                ItemPaymentComponent(
-                    image = paymentsItem.image,
-                    title = paymentsItem.title,
-                    content = paymentsItem.content,
-                    note = paymentsItem.note,
-                    onClick = { navController.navigate("paymentInstruction/${paymentsItem.title}") }
+        SwipeRefresh(
+            state = SwipeRefreshState(isRefreshing),
+            onRefresh = { viewModel.refreshPaymentsList() },
+            indicator = { state, trigger ->
+                SwipeRefreshIndicator(
+                    state = state,
+                    refreshTriggerDistance = trigger,
+                    scale = true,
+                    contentColor = Red_Dark,
                 )
+            }
+        ) {
+            LazyColumn(
+                modifier = modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .fillMaxSize()
+            ) {
+                items(paymentsList) { paymentsItem ->
+                    ItemPaymentComponent(
+                        image = paymentsItem.image,
+                        title = paymentsItem.title,
+                        content = paymentsItem.content,
+                        note = paymentsItem.note,
+                        onClick = { navController.navigate("paymentInstruction/${paymentsItem.title}") }
+                    )
+                }
             }
         }
     }

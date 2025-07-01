@@ -21,6 +21,9 @@ class PaymentsViewModel @Inject constructor() : CspAppViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+
     private val _errorMessage = MutableStateFlow("")
     val errorMessage: StateFlow<String> = _errorMessage
 
@@ -65,6 +68,12 @@ class PaymentsViewModel @Inject constructor() : CspAppViewModel() {
                     _isLoading.value = false
                 }
         }
+    }
+
+    fun refreshPaymentsList() {
+        _isRefreshing.value = true
+        fetchPaymentsList()
+        _isRefreshing.value = false
     }
 }
 
