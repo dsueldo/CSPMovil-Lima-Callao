@@ -19,3 +19,41 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# Keep application classes
+-keep class com.colegiosociologosperu.cspmovillimacallao.** { *; }
+
+# Keep ViewModel classes
+-keep class androidx.lifecycle.ViewModel { *; }
+
+# Keep Compose-related classes
+-keep class androidx.compose.** { *; }
+
+# Keep Hilt-generated classes
+-keep class dagger.hilt.** { *; }
+-keep class * extends dagger.hilt.internal.GeneratedComponent { *; }
+
+# Keep Firebase-related classes
+-keep class com.google.firebase.** { *; }
+-keepattributes Signature
+
+# Keep Retrofit and Gson models
+-keep class com.colegiosociologosperu.cspmovillimacallao.models.** { *; }
+-keepattributes *Annotation*
+
+# Keep logging (optional)
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+    public static int w(...);
+    public static int e(...);
+}
+
+# Hilt-specific rules
+-keep class dagger.hilt.** { *; }
+-keep class hilt_aggregated_deps.** { *; }
+-keep class dagger.hilt.android.** { *; }
+-keep class com.google.dagger.hilt.** { *; }
+-keep @dagger.hilt.EntryPoint class * { *; }
+-keep @dagger.hilt.InstallIn class * { *; }
+-keep class **_HiltModules_* { *; }
