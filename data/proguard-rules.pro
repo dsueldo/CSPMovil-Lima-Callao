@@ -57,3 +57,7 @@
 -keep @dagger.hilt.EntryPoint class * { *; }
 -keep @dagger.hilt.InstallIn class * { *; }
 -keep class **_HiltModules_* { *; }
+
+#proguard
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
