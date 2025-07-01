@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="send">Enviar</string>
+    <string name="change_password">Cambiar Contraseña</string>
+    <string name="email">Email</string>
+    <string name="lock">Lock</string>
+    <string name="ok">OK</string>
+    <string name="logo">Logo</string>
+    <string name="alert">Alerta!</string>
+    <string name="send_email">Correo enviado exitosamente. Revisar su bandeja de entrada.</string>
+    <string name="email_not_same">Los correos no coinciden.</string>
+    <string name="enter">Ingresar</string>
+    <string name="register">Registrarse</string>
+    <string name="password_incorrect">Contraseña Incorrecta</string>
+    <string name="password_incorrect_detail">La contraseña ingresada es incorrecta. Intente de nuevo.</string>
+    <string name="password_incorrect_try_again">Credenciales incorrectas. Intente de nuevo.</string>
+    <string name="password_strong">La contraseña es fuerte</string>
+    <string name="register_successful">Registro Exitoso</string>
+    <string name="register_successful_detail">Te has registrado correctamente.</string>
+    <string name="register_successful_account">Cuenta Registrada</string>
+    <string name="register_email_error">El correo ya se encuentra registrado.</string>
+    <string name="register_email_error_not_exist">El correo no puede ser registrado.</string>
+</resources>
