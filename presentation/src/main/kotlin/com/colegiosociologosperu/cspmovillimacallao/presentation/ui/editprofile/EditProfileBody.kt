@@ -103,7 +103,11 @@ fun EditProfileBody(
                 cursorColor = Color.Black
             ),
             value = profileUiState.phone,
-            onValueChange = { viewModel.updatePhoneNumber(it) },
+            onValueChange = { phone ->
+                if (phone.length <= 9 && phone.all { it.isDigit() }) {
+                    viewModel.updatePhoneNumber(phone)
+                }
+            },
             label = {
                 Text(
                     text = "Celular",
@@ -216,7 +220,11 @@ fun EditProfileBody(
                 cursorColor = Color.Black
             ),
             value = profileUiState.dni,
-            onValueChange = { viewModel.updateDni(it) },
+            onValueChange = { dni ->
+                if (dni.length <= 8 && dni.all { it.isDigit() }) {
+                    viewModel.updateDni(dni)
+                }
+            },
             label = {
                 Text(
                     text = "DNI",
@@ -245,7 +253,11 @@ fun EditProfileBody(
                 cursorColor = Color.Black
             ),
             value = profileUiState.codeNumber,
-            onValueChange = { viewModel.updateCodeNumber(it) },
+            onValueChange = { code ->
+                if (code.length <= 4 && code.all { it.isDigit() }) {
+                    viewModel.updateCodeNumber(code)
+                }
+            },
             label = {
                 Text(
                     text = "Número de Colegiatura",
