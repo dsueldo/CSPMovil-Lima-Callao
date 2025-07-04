@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,9 +11,27 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+val keystoreProperties = Properties().apply {
+    val keystoreFile = rootProject.file("keystore.properties")
+    if (keystoreFile.exists()) {
+        load(FileInputStream(keystoreFile))
+    } else {
+        throw GradleException("keystore.properties no encontrado en la raíz del proyecto. La firma de release podría fallar.")
+    }
+}
+
 android {
     namespace = "com.colegiosociologosperu.cspmovillimacallao"
     compileSdk = 35
+
+    signingConfigs {
+        create("release") {
+            storeFile = file(keystoreProperties["storeFile"] as String)
+            storePassword = keystoreProperties["storePassword"] as String
+            keyAlias = keystoreProperties["keyAlias"] as String
+            keyPassword = keystoreProperties["keyPassword"] as String
+        }
+    }
 
     defaultConfig {
         applicationId = "com.colegiosociologosperu.cspmovillimacallao"
@@ -23,11 +44,21 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+            isDebuggable = true
+            isMinifyEnabled = false
+            isShrinkResources = false
+            resValue("string", "app_name", "CSPMovil Lima Callao (Debug)")
         }
     }
     compileOptions {
@@ -87,13 +118,13 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
 
-    implementation("io.coil-kt.coil3:coil-compose:3.0.4")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.4")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
-    implementation(platform("com.google.firebase:firebase-bom:32.x.x")) // Asegúrate de usar la última versión del BoM
-    implementation("com.google.firebase:firebase-appcheck")
-    implementation("com.google.firebase:firebase-appcheck-playintegrity") // Para Play Integrity API
-    implementation("com.google.firebase:firebase-appcheck-debug")
+    implementation(platform(libs.firebase.bom.v3300)) // Asegúrate de usar la última versión del BoM
+    implementation(libs.firebase.appcheck)
+    implementation(libs.firebase.appcheck.playintegrity) // Para Play Integrity API
+    implementation(libs.firebase.appcheck.debug)
 
     implementation(libs.androidx.security.crypto.ktx.v110alpha06)
     implementation(project(":presentation"))
