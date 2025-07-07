@@ -66,7 +66,7 @@ class ProfileViewModel @Inject constructor(
                 val profile = profileUseCase.getProfileData()
                 _profileUiState.value = profile
             } catch (e: Exception) {
-                _errorMessage.value = e.message ?: "Error"
+                _errorMessage.value = e.message ?: "Error al refrescar el perfil"
             } finally {
                 _isRefreshing.value = false
             }

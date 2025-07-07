@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,19 +43,28 @@ fun ProfileScreen(
     onSignOut: () -> Unit,
     onDeleteAccount: () -> Unit,
     navController: NavController = rememberNavController(),
-    modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val profileState by viewModel.profileUiState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val showSignOutDialog = remember { mutableStateOf(false) }
     val showDeleteAccountDialog = remember { mutableStateOf(false) }
-    val isRefreshing by viewModel.isRefreshing.collectAsState()
     val email = viewModel.userEmail.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.refreshProfile()
+    val profileUpdated = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getLiveData<Boolean>("profile_updated")
+        ?.observeAsState(false)
+
+    LaunchedEffect(profileUpdated?.value) {
+        if (profileUpdated?.value == true) {
+            viewModel.refreshProfile()
+            navController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.set("profile_updated", false)
+        }
     }
 
     if (isLoading) {
@@ -144,7 +154,7 @@ fun ProfileScreen(
     }
 
     Scaffold(
-        modifier = modifier
+        modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .fillMaxSize()
             .padding(16.dp),

@@ -80,16 +80,6 @@ class EditProfileViewModel @Inject constructor(
         _profileUiState.value = _profileUiState.value.copy(specialized = specialized.trim())
     }
 
-    fun validateFields(): Boolean {
-        return _profileUiState.value.name.isNotEmpty() &&
-                _profileUiState.value.lastName.isNotEmpty() &&
-                _profileUiState.value.email.isNotEmpty() &&
-                _profileUiState.value.phone.isNotEmpty() &&
-                _profileUiState.value.birthday.isNotEmpty() &&
-                _profileUiState.value.gender.isNotEmpty() &&
-                _profileUiState.value.codeNumber.isNotEmpty()
-    }
-
     fun saveProfile() {
         _isLoading.value = true
         viewModelScope.launch {
@@ -98,17 +88,17 @@ class EditProfileViewModel @Inject constructor(
                 val newProfile = _profileUiState.value
 
                 val updatedProfile = currentProfile.copy(
-                    name = if (newProfile.name.isNotBlank()) newProfile.name else currentProfile.name,
-                    lastName = if (newProfile.lastName.isNotBlank()) newProfile.lastName else currentProfile.lastName,
-                    email = if (newProfile.email.isNotBlank()) newProfile.email else currentProfile.email,
-                    phone = if (newProfile.phone.isNotBlank()) newProfile.phone else currentProfile.phone,
-                    birthday = if (newProfile.birthday.isNotBlank()) newProfile.birthday else currentProfile.birthday,
-                    gender = if (newProfile.gender.isNotBlank()) newProfile.gender else currentProfile.gender,
-                    dni = if (newProfile.dni.isNotBlank()) newProfile.dni else currentProfile.dni,
-                    codeNumber = if (newProfile.codeNumber.isNotBlank()) newProfile.codeNumber else currentProfile.codeNumber,
-                    specialized = if (newProfile.specialized.isNotBlank()) newProfile.specialized else currentProfile.specialized,
-                    condition = if (newProfile.condition.isNotBlank()) newProfile.condition else currentProfile.condition,
-                    payLastPeriod = if (newProfile.payLastPeriod.isNotBlank()) newProfile.payLastPeriod else currentProfile.payLastPeriod,
+                    name = newProfile.name.ifBlank { currentProfile.name },
+                    lastName = newProfile.lastName.ifBlank { currentProfile.lastName },
+                    email = newProfile.email.ifBlank { currentProfile.email },
+                    phone = newProfile.phone.ifBlank { currentProfile.phone },
+                    birthday = newProfile.birthday.ifBlank { currentProfile.birthday },
+                    gender = newProfile.gender.ifBlank { currentProfile.gender },
+                    dni = newProfile.dni.ifBlank { currentProfile.dni },
+                    codeNumber = newProfile.codeNumber.ifBlank { currentProfile.codeNumber },
+                    specialized = newProfile.specialized.ifBlank { currentProfile.specialized },
+                    condition = newProfile.condition.ifBlank { currentProfile.condition },
+                    payLastPeriod = newProfile.payLastPeriod.ifBlank { currentProfile.payLastPeriod },
                 )
                 profileUseCase.saveProfileData(updatedProfile)
                 _uiState.value = true

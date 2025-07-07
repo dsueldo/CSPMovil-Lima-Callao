@@ -8,6 +8,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,6 +23,17 @@ fun EditProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: EditProfileViewModel = hiltViewModel(),
 ) {
+
+    val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState) {
+        if (uiState) {
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set("profile_updated", true)
+            navController.popBackStack()
+        }
+    }
 
     Scaffold(
         modifier = modifier
@@ -45,7 +59,6 @@ fun EditProfileScreen(
                 modifier = Modifier,
                 onClickSave = {
                     viewModel.saveProfile()
-                    navController.popBackStack()
                 }
             )
         }
