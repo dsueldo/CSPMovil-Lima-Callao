@@ -14,23 +14,28 @@ import com.colegiosociologosperu.cspmovillimacallao.BuildConfig
 class CspApplication : Application() {
     override fun onCreate() {
         super.onCreate()
+        // 1. Inicializa Firebase App Check
         FirebaseApp.initializeApp(this)
 
         val firebaseAppCheck = FirebaseAppCheck.getInstance()
 
-        // Este es el proveedor de producción. Está bien que esté aquí.
-        firebaseAppCheck.installAppCheckProviderFactory(
-            PlayIntegrityAppCheckProviderFactory.getInstance()
-        )
-
-        // ESTE ES EL BLOQUE CLAVE PARA EL DEBUG TOKEN
-        // Asegúrate de que BuildConfig.DEBUG es el de tu módulo (normalmente auto-generado por Gradle)
+        // 2. Instala el proveedor de atestación
+        // Usa PlayIntegrityAppCheckProviderFactory para builds de release (producción)
+        // Usa DebugAppCheckProviderFactory para builds de debug (desarrollo)
         if (BuildConfig.DEBUG) {
+            // Para depuración: usa el proveedor de depuración.
+            // Necesitarás añadir el token de depuración a Firebase Console.
             firebaseAppCheck.installAppCheckProviderFactory(
                 DebugAppCheckProviderFactory.getInstance() // <--- ¡Asegúrate de que NO tenga argumentos!
             )
-            // Opcional: añade un Log.d para confirmar que este bloque se está ejecutando
             Log.d("AppCheckDebug", "DebugAppCheckProviderFactory está siendo instalado.")
+        } else {
+            // Para release: usa el proveedor de Play Integrity.
+            // Requiere que tu app esté distribuida en Google Play.
+            firebaseAppCheck.installAppCheckProviderFactory(
+                PlayIntegrityAppCheckProviderFactory.getInstance()
+            )
+            Log.d("AppCheckProd", "ProdAppCheckProviderFactory está siendo instalado.")
         }
     }
 }
