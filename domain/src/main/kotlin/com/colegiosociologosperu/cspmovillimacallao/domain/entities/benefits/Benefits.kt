@@ -6,4 +6,6 @@ data class Benefits(
     val title: String = "",
     val content: String = "",
     val order: Int = 0,
+    val source: String = "",
+    val date: String = "",
 )

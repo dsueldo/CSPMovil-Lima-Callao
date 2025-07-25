@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -44,6 +45,22 @@ fun BenefitsDetailBody(
             model = benefitsDetail.image,
             contentScale = ContentScale.Crop,
             contentDescription = null,
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = "Fuente: ${benefitsDetail.source}",
+            style = Typography.bodySmall,
+            color = Color.Black,
+            textAlign = TextAlign.Start,
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = benefitsDetail.date,
+            style = Typography.bodyMedium,
+            color = Color.Black,
+            textAlign = TextAlign.Start,
         )
         Spacer(modifier = Modifier.padding(8.dp))
         Text(
