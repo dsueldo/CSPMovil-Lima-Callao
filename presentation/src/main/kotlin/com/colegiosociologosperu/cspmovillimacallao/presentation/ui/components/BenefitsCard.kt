@@ -34,14 +34,6 @@ fun BenefitsCard(
         shape = MaterialTheme.shapes.medium
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = benefits.date,
-                style = Typography.bodyMedium,
-                color = Color.Black,
-                textAlign = TextAlign.End,
-            )
-            Spacer(modifier = Modifier.height(2.dp))
             AsyncImage(
                 modifier = Modifier.fillMaxWidth(),
                 model = benefits.image,
@@ -64,6 +56,14 @@ fun BenefitsCard(
                 style = Typography.bodyLarge,
                 color = Color.Black,
                 textAlign = TextAlign.Justify,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = benefits.date,
+                style = Typography.bodyMedium,
+                color = Color.Black,
+                textAlign = TextAlign.Start,
             )
         }
     }

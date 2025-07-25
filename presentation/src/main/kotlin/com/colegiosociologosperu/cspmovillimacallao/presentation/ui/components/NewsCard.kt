@@ -34,14 +34,6 @@ fun NewsCard(
         shape = MaterialTheme.shapes.medium,
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = news.date,
-                style = Typography.bodyMedium,
-                color = Color.Black,
-                textAlign = TextAlign.End,
-            )
-            Spacer(modifier = Modifier.height(2.dp))
             AsyncImage(
                 modifier = Modifier.fillMaxWidth(),
                 model = news.image,
@@ -72,6 +64,14 @@ fun NewsCard(
                 style = Typography.bodyMedium,
                 color = Color.Black,
                 textAlign = TextAlign.Justify,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = news.date,
+                style = Typography.bodySmall,
+                color = Color.Black,
+                textAlign = TextAlign.Start,
             )
         }
     }

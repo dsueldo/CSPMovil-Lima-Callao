@@ -54,14 +54,6 @@ fun NewsDetailBody(
             color = Color.Black,
             textAlign = TextAlign.Start,
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = newsDetail.date,
-            style = Typography.bodyMedium,
-            color = Color.Black,
-            textAlign = TextAlign.Start,
-        )
         Spacer(modifier = Modifier.padding(8.dp))
         Text(
             modifier = Modifier.fillMaxWidth(),
@@ -86,6 +78,14 @@ fun NewsDetailBody(
             style = Typography.bodyMedium,
             color = Color.Black,
             textAlign = TextAlign.Justify,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = newsDetail.date,
+            style = Typography.bodySmall,
+            color = Color.Gray,
+            textAlign = TextAlign.Start,
         )
     }
 }

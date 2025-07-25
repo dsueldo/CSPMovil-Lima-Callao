@@ -54,14 +54,6 @@ fun BenefitsDetailBody(
             color = Color.Black,
             textAlign = TextAlign.Start,
         )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = benefitsDetail.date,
-            style = Typography.bodyMedium,
-            color = Color.Black,
-            textAlign = TextAlign.Start,
-        )
         Spacer(modifier = Modifier.padding(8.dp))
         Text(
             modifier = Modifier.fillMaxWidth(),
@@ -70,6 +62,14 @@ fun BenefitsDetailBody(
             style = Typography.bodyLarge,
             color = Color.Black,
             textAlign = TextAlign.Justify,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = benefitsDetail.date,
+            style = Typography.bodyMedium,
+            color = Color.Black,
+            textAlign = TextAlign.Start,
         )
         Spacer(modifier = Modifier.padding(8.dp))
         Text(
