@@ -7,4 +7,6 @@ data class News (
     val content: String = "",
     val description: String = "",
     val order: Int = 0,
+    val source: String = "",
+    val date: String = "",
 )

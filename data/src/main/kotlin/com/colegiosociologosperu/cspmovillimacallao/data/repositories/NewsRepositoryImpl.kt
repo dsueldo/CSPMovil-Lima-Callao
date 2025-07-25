@@ -16,7 +16,7 @@ class NewsRepositoryImpl @Inject constructor() : NewsRepository {
     override suspend fun getAllNews(): List<News> {
         return try {
             firestore.collection("news")
-                .orderBy("order", Query.Direction.ASCENDING)
+                .orderBy("order", Query.Direction.DESCENDING)
                 .get()
                 .await()
                 .documents
@@ -27,6 +27,8 @@ class NewsRepositoryImpl @Inject constructor() : NewsRepository {
                     Log.d(TAG, "Current data title: $title")
                     Log.d(TAG, "Current data content: $content")
                     Log.d(TAG, "Current data description: $description")
+                    Log.d(TAG, "Current data source: $source")
+                    Log.d(TAG, "Current data date: $date")
                 }
             }
         } catch (e: Exception) {

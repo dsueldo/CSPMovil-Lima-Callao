@@ -24,6 +24,7 @@ import com.colegiosociologosperu.cspmovillimacallao.data.repositories.BenefitsRe
 import com.colegiosociologosperu.cspmovillimacallao.data.repositories.NewsRepositoryImpl
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.benefits.BenefitsScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.benefits.detail.BenefitsDetailScreen
+import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.contact.ContactScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.editprofile.EditProfileScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news.NewsScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news.detail.NewsDetailScreen
@@ -102,6 +103,7 @@ fun MainNavigation(
                 onDeleteAccount,
                 navController,
             ) }
+            composable("contact") { ContactScreen(navController) }
             composable("editProfile") { EditProfileScreen(navController) }
             composable(
                 "news/{newsId}",

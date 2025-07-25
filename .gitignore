@@ -13,6 +13,7 @@ local.properties
 *.aar
 *.ap_
 *.aab
+*.dm
 
 # Android Studio captures folder
 captures/

@@ -1,6 +1,8 @@
 package com.colegiosociologosperu.cspmovillimacallao.presentation.ui.profile
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,7 +22,8 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typ
 fun ProfileFooter(
     modifier: Modifier = Modifier,
     onSignOut: () -> Unit,
-    onDeleteAccount: () -> Unit
+    onDeleteAccount: () -> Unit,
+    onContactClick: () -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -28,24 +31,40 @@ fun ProfileFooter(
     ) {
         Spacer(modifier = Modifier.height(32.dp))
         Button(
-            onClick = onSignOut,
+            onClick = onContactClick,
             colors = ButtonDefaults.textButtonColors(Red_Dark),
         ) {
             Text(
-                text = "Cerrar sesión",
+                text = "Contacto",
                 color = Color.White,
                 style = Typography.bodyMedium
             )
         }
-        Button(
-            onClick = onDeleteAccount,
-            colors = ButtonDefaults.textButtonColors(Red_Dark),
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(
-                text = "Eliminar Cuenta",
-                color = Color.White,
-                style = Typography.bodyMedium
-            )
+            Button(
+                onClick = onSignOut,
+                colors = ButtonDefaults.textButtonColors(Red_Dark),
+            ) {
+                Text(
+                    text = "Cerrar sesión",
+                    color = Color.White,
+                    style = Typography.bodyMedium
+                )
+            }
+            Button(
+                onClick = onDeleteAccount,
+                colors = ButtonDefaults.textButtonColors(Red_Dark),
+            ) {
+                Text(
+                    text = "Eliminar Cuenta",
+                    color = Color.White,
+                    style = Typography.bodyMedium
+                )
+            }
         }
     }
 }
@@ -55,6 +74,7 @@ fun ProfileFooter(
 private fun ProfileFooterPreview() {
     ProfileFooter(
         onSignOut = {},
-        onDeleteAccount = {}
+        onDeleteAccount = {},
+        onContactClick = {}
     )
 }

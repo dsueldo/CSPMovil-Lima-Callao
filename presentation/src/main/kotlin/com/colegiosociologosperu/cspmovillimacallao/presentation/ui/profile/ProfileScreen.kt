@@ -194,6 +194,9 @@ fun ProfileScreen(
                 onDeleteAccount = {
                     showDeleteAccountDialog.value = true
                 },
+                onContactClick = {
+                    navController.navigate("contact")
+                }
             )
         }
     )
