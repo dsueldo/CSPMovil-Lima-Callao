@@ -1,5 +1,7 @@
 package com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,6 +34,7 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typ
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.factories.NewsListViewModelFactory
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.news.NewsListViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsScreen(

@@ -1,5 +1,7 @@
 package com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news.detail
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,8 +13,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,8 +28,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
+import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.time.getRelativeTime
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.news.detail.NewsDetailViewModel
+import kotlinx.coroutines.delay
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NewsDetailBody(
     modifier: Modifier = Modifier,
@@ -31,6 +40,14 @@ fun NewsDetailBody(
     onImageClick: (String) -> Unit
 ) {
     val newsDetail by viewModel.newsDetail.collectAsState()
+    var relativeTime by remember { mutableStateOf(getRelativeTime(newsDetail.date)) }
+
+    LaunchedEffect(newsDetail.date) {
+        while (true) {
+            relativeTime = getRelativeTime(newsDetail.date)
+            delay(60_000)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -82,7 +99,7 @@ fun NewsDetailBody(
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = newsDetail.date,
+            text = relativeTime,
             style = Typography.bodySmall,
             color = Color.Gray,
             textAlign = TextAlign.Start,
