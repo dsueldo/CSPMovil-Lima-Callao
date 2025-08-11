@@ -37,7 +37,7 @@ android {
         applicationId = "com.colegiosociologosperu.cspmovillimacallao"
         minSdk = 24
         targetSdk = 35
-        versionCode = 10 //
+        versionCode = 10
         versionName = "1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -121,9 +121,9 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
-    implementation(platform(libs.firebase.bom.v3300)) // Asegúrate de usar la última versión del BoM
+    implementation(platform(libs.firebase.bom.v3300))
     implementation(libs.firebase.appcheck)
-    implementation(libs.firebase.appcheck.playintegrity) // Para Play Integrity API
+    implementation(libs.firebase.appcheck.playintegrity)
     implementation(libs.firebase.appcheck.debug)
 
     implementation(libs.androidx.security.crypto.ktx.v110alpha06)

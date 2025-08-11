@@ -36,13 +36,12 @@ fun NewsCard(
     news: News,
     onNewsClick: (News) -> Unit
 ) {
-
     var relativeTime by remember { mutableStateOf(getRelativeTime(news.date)) }
 
     LaunchedEffect(news.date) {
         while (true) {
             relativeTime = getRelativeTime(news.date)
-            delay(60_000) // Actualiza cada minuto
+            delay(60_000)
         }
     }
 
