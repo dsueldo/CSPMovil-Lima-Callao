@@ -14,6 +14,7 @@ local.properties
 *.ap_
 *.aab
 *.dm
+*.xml
 
 # Android Studio captures folder
 captures/
@@ -28,7 +29,7 @@ output-metadata.json
 
 # IntelliJ
 *.iml
-.idea/
+*.idea
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
