@@ -3,7 +3,6 @@ package com.colegiosociologosperu.cspmovillimacallao.presentation.ui.editprofile
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
@@ -49,14 +48,11 @@ fun EditProfileScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
-            modifier = modifier
-                .systemBarsPadding()
-                .fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             topBar = {
                 EditProfileHeader(
-                    onBack = { navController.popBackStack() },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    onBack = { navController.popBackStack() }
                 )
             },
             bottomBar = {
