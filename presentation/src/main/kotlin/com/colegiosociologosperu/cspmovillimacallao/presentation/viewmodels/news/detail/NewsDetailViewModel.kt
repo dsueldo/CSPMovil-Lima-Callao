@@ -28,11 +28,15 @@ class NewsDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(false)
     val uiState: StateFlow<Boolean> = _uiState
 
+    private val _isFavorite = MutableStateFlow(false)
+    val isFavorite: StateFlow<Boolean> = _isFavorite
+
     fun fetchNewsDetail(newsId: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 _newsDetail.value = repository.getNewsDetail(newsId)
+                _isFavorite.value = repository.isFavorite(newsId)
                 _uiState.value = true
                 _isLoading.value = false
                 Log.d("NewsDetailViewModel", "News Detail: ${_newsDetail.value}")
@@ -43,6 +47,13 @@ class NewsDetailViewModel @Inject constructor(
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    fun toggleFavorite(newsId: String) {
+        viewModelScope.launch {
+            repository.toggleFavorite(newsId)
+            _isFavorite.value = repository.isFavorite(newsId)
         }
     }
 }

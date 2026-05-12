@@ -28,6 +28,7 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.contact.Cont
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.editprofile.EditProfileScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news.NewsScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news.detail.NewsDetailScreen
+import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news.favorites.FavoritesScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.payment.PaymentOneScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.payment.instruction.PaymentInstructionScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.profile.ProfileScreen
@@ -122,6 +123,9 @@ fun MainNavigation(
             ) { backStackEntry ->
                 val benefitsId = backStackEntry.arguments?.getString("benefitsId") ?: ""
                 BenefitsDetailScreen(benefitsId, navController)
+            }
+            composable("favorites") {
+                FavoritesScreen(navController = navController)
             }
         }
     }

@@ -6,11 +6,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,6 +52,7 @@ fun NewsDetailScreen(
     val newsDetail by viewModel.newsDetail.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
+    val isFavorite by viewModel.isFavorite.collectAsState()
 
     LaunchedEffect(newsId) {
         viewModel.fetchNewsDetail(newsId)
@@ -53,7 +62,9 @@ fun NewsDetailScreen(
         newsDetail = newsDetail,
         isLoading = isLoading,
         errorMessage = errorMessage,
+        isFavorite = isFavorite,
         onBack = { navController.popBackStack() },
+        onFavoriteToggle = { viewModel.toggleFavorite(newsId) },
         modifier = modifier
     )
 }
@@ -65,7 +76,9 @@ fun NewsDetailContent(
     newsDetail: News,
     isLoading: Boolean,
     errorMessage: String,
+    isFavorite: Boolean,
     onBack: () -> Unit,
+    onFavoriteToggle: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var fullscreenImageState by remember { mutableStateOf<String?>(null) }
@@ -74,8 +87,29 @@ fun NewsDetailContent(
         Scaffold(
             modifier = modifier,
             topBar = {
-                NewsDetailHeader(
-                    onBack = onBack
+                TopAppBar(
+                    title = { Text("Detalle de la noticia") },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Atrás"
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = onFavoriteToggle) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
+                                contentDescription = if (isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
+                                tint = if (isFavorite) Red_Dark else MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = MaterialTheme.colorScheme.onBackground
+                    )
                 )
             }
         ) { paddingValues ->
@@ -157,7 +191,9 @@ fun NewsDetailScreenPreview() {
             newsDetail = mockNews,
             isLoading = false,
             errorMessage = "",
-            onBack = {}
+            isFavorite = true,
+            onBack = {},
+            onFavoriteToggle = {}
         )
     }
 }

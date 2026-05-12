@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -50,6 +54,9 @@ fun NewsScreen(
         onRefresh = { viewModel.refreshNewsList() },
         onNewsClick = { news ->
             navController.navigate("news/${news.id}")
+        },
+        onFavoritesClick = {
+            navController.navigate("favorites")
         }
     )
 }
@@ -62,7 +69,8 @@ fun NewsScreenContent(
     isLoading: Boolean,
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
-    onNewsClick: (News) -> Unit
+    onNewsClick: (News) -> Unit,
+    onFavoritesClick: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -73,6 +81,15 @@ fun NewsScreenContent(
                         style = Typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
+                },
+                actions = {
+                    IconButton(onClick = onFavoritesClick) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Favoritos",
+                            tint = Red_Dark
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
@@ -146,7 +163,8 @@ fun NewsScreenPreview() {
             isLoading = false,
             isRefreshing = false,
             onRefresh = {},
-            onNewsClick = {}
+            onNewsClick = {},
+            onFavoritesClick = {}
         )
     }
 }

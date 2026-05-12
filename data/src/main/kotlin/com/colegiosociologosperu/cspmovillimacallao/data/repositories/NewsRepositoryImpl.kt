@@ -1,17 +1,23 @@
 package com.colegiosociologosperu.cspmovillimacallao.data.repositories
 
 import android.content.ContentValues.TAG
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.colegiosociologosperu.cspmovillimacallao.domain.entities.news.News
 import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.NewsRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
-class NewsRepositoryImpl @Inject constructor() : NewsRepository {
+class NewsRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context
+) : NewsRepository {
 
     private val firestore = FirebaseFirestore.getInstance()
+    private val sharedPreferences: SharedPreferences = context.getSharedPreferences("news_prefs", Context.MODE_PRIVATE)
 
     override suspend fun getAllNews(): List<News> {
         return try {
@@ -48,5 +54,28 @@ class NewsRepositoryImpl @Inject constructor() : NewsRepository {
             println("Error fetching news detail for $newsId: ${e.localizedMessage}")
             throw e
         }
+    }
+
+    override suspend fun toggleFavorite(newsId: String) {
+        val favorites = sharedPreferences.getStringSet("favorites", emptySet())?.toMutableSet() ?: mutableSetOf()
+        if (favorites.contains(newsId)) {
+            favorites.remove(newsId)
+        } else {
+            favorites.add(newsId)
+        }
+        sharedPreferences.edit().putStringSet("favorites", favorites).apply()
+    }
+
+    override suspend fun isFavorite(newsId: String): Boolean {
+        val favorites = sharedPreferences.getStringSet("favorites", emptySet())
+        return favorites?.contains(newsId) == true
+    }
+
+    override suspend fun getFavoriteNews(): List<News> {
+        val favoriteIds = sharedPreferences.getStringSet("favorites", emptySet()) ?: emptySet()
+        if (favoriteIds.isEmpty()) return emptyList()
+        
+        val allNews = getAllNews()
+        return allNews.filter { favoriteIds.contains(it.id) }
     }
 }
