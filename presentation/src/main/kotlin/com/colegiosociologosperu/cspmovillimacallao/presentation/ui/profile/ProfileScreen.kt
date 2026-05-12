@@ -1,21 +1,31 @@
 package com.colegiosociologosperu.cspmovillimacallao.presentation.ui.profile
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ContactSupport
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,35 +33,31 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
-import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.colegiosociologosperu.cspmovillimacallao.domain.entities.user.ProfileUiState
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
+import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.profile.ProfileViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     onSignOut: () -> Unit,
-    onDeleteAccount: () -> Unit,
     navController: NavController = rememberNavController(),
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val profileState by viewModel.profileUiState.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
-    val showSignOutDialog = remember { mutableStateOf(false) }
-    val showDeleteAccountDialog = remember { mutableStateOf(false) }
-    val email = viewModel.userEmail.collectAsState()
+    val email by viewModel.userEmail.collectAsState()
 
     val profileUpdated = navController.currentBackStackEntry
         ?.savedStateHandle
@@ -67,33 +73,39 @@ fun ProfileScreen(
         }
     }
 
-    if (isLoading) {
-        BasicAlertDialog(
-            onDismissRequest = { },
-            content = {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = Red_Dark
-                    )
-                }
-            },
-        )
-    }
+    ProfileContent(
+        profileState = profileState,
+        isLoading = isLoading,
+        isRefreshing = isRefreshing,
+        email = email,
+        onSignOut = onSignOut,
+        onRefresh = { viewModel.refreshProfile() },
+        onEditProfile = { navController.navigate("editProfile") },
+        onContact = { navController.navigate("contact") }
+    )
+}
 
-    if (errorMessage.isNotEmpty()) {
-        Text(text = errorMessage, color = MaterialTheme.colorScheme.error)
-    }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileContent(
+    profileState: ProfileUiState,
+    isLoading: Boolean,
+    isRefreshing: Boolean,
+    email: String,
+    onSignOut: () -> Unit,
+    onRefresh: () -> Unit,
+    onEditProfile: () -> Unit,
+    onContact: () -> Unit
+) {
+    var showSignOutDialog by remember { mutableStateOf(false) }
 
-    if (showSignOutDialog.value) {
+    if (showSignOutDialog) {
         AlertDialog(
-            onDismissRequest = { showSignOutDialog.value = false },
+            onDismissRequest = { showSignOutDialog = false },
             confirmButton = {
                 Button(
                     onClick = {
-                        showSignOutDialog.value = false
+                        showSignOutDialog = false
                         onSignOut()
                     },
                     colors = ButtonDefaults.buttonColors(
@@ -101,112 +113,131 @@ fun ProfileScreen(
                         contentColor = Color.White
                     )
                 ) {
-                    Text("OK")
+                    Text("Cerrar Sesión")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showSignOutDialog = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Red_Dark)
+                ) {
+                    Text("Cancelar")
                 }
             },
             title = { Text("Cerrar Sesión") },
-            text = { Text("¿Está seguro que desea cerrar sesión?") },
-            dismissButton = {
-                Button(
-                    onClick = { showSignOutDialog.value = false },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Red_Dark,
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text("Cancelar")
-                }
-            }
+            text = { Text("¿Está seguro que desea cerrar sesión?") }
         )
     }
 
-    if (showDeleteAccountDialog.value) {
-        AlertDialog(
-            onDismissRequest = { showDeleteAccountDialog.value = false },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        showDeleteAccountDialog.value = false
-                        onDeleteAccount()
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Perfil",
+                            style = Typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
+                        )
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Red_Dark,
-                        contentColor = Color.White
+                    actions = {
+                        IconButton(onClick = onContact) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ContactSupport,
+                                contentDescription = "Contacto",
+                                tint = Red_Dark
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = MaterialTheme.colorScheme.onBackground
                     )
-                ) {
-                    Text("OK")
-                }
+                )
             },
-            title = { Text("Eliminar Cuenta") },
-            text = { Text("¿Está seguro que desea eliminar cuenta?") },
-            dismissButton = {
-                Button(
-                    onClick = { showDeleteAccountDialog.value = false },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Red_Dark,
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text("Cancelar")
-                }
-            }
-        )
-    }
-
-    Scaffold(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .fillMaxSize()
-            .padding(16.dp),
-        topBar = {
-            ProfileHeader(
-                name = profileState.name,
-                onEditAccount = { navController.navigate("editProfile") }
-            )
-        },
-        content = { paddingValues ->
-            SwipeRefresh(
-                state = SwipeRefreshState(isRefreshing),
-                onRefresh = { viewModel.refreshProfile() },
-                indicator = { state, trigger ->
-                    SwipeRefreshIndicator(
-                        state = state,
-                        refreshTriggerDistance = trigger,
-                        scale = true,
-                        contentColor = Red_Dark,
-                    )
-                }
-            ) {
-                ProfileBody(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .verticalScroll(rememberScrollState()),
-                    viewModel = viewModel,
-                    email = email.value,
+            bottomBar = {
+                ProfileFooter(
+                    onSignOut = { showSignOutDialog = true }
                 )
             }
-        },
-        bottomBar = {
-            ProfileFooter(
-                onSignOut = {
-                    showSignOutDialog.value = true
+        ) { paddingValues ->
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = onRefresh,
+                indicator = {
+                    PullToRefreshDefaults.Indicator(
+                        state = rememberPullToRefreshState(),
+                        isRefreshing = isRefreshing,
+                        containerColor = Color.White,
+                        color = Red_Dark,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
                 },
-                onDeleteAccount = {
-                    showDeleteAccountDialog.value = true
-                },
-                onContactClick = {
-                    navController.navigate("contact")
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    if (isLoading && !isRefreshing) {
+                        Box(modifier = Modifier.padding(vertical = 16.dp)) {
+                            ProfileHeaderShimmer()
+                        }
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            HorizontalDivider()
+                            repeat(8) {
+                                ItemProfileShimmer()
+                            }
+                            HorizontalDivider()
+                        }
+                    } else {
+                        Box(modifier = Modifier.padding(vertical = 16.dp)) {
+                            ProfileHeader(
+                                name = profileState.name,
+                                onEditAccount = onEditProfile
+                            )
+                        }
+                        ProfileBody(
+                            profileUiState = profileState,
+                            email = email,
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-            )
+            }
         }
-    )
+    }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun ProfileScreenPreview() {
-    ProfileScreen(
-        onSignOut = {},
-        onDeleteAccount = {}
-    )
+    MaterialTheme {
+        ProfileContent(
+            profileState = ProfileUiState(
+                name = "Juan",
+                lastName = "Perez",
+                phone = "987654321",
+                dni = "12345678",
+                gender = "Masculino",
+                birthday = "01/01/1990",
+                codeNumber = "12345",
+                condition = "Activo",
+                specialized = "Sociología",
+                payLastPeriod = "2023-12"
+            ),
+            isLoading = false,
+            isRefreshing = false,
+            email = "juan.perez@example.com",
+            onSignOut = {},
+            onRefresh = {},
+            onEditProfile = {},
+            onContact = {}
+        )
+    }
 }

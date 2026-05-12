@@ -2,7 +2,7 @@ package com.colegiosociologosperu.cspmovillimacallao.presentation.ui.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material.icons.outlined.Email
@@ -12,27 +12,23 @@ import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material.icons.outlined.Phone
 import androidx.compose.material.icons.outlined.School
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.colegiosociologosperu.cspmovillimacallao.domain.entities.user.ProfileUiState
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.ItemProfileComponent
-import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.profile.ProfileViewModel
 
 @Composable
 fun ProfileBody(
     modifier: Modifier = Modifier,
-    viewModel: ProfileViewModel,
+    profileUiState: ProfileUiState,
     email: String,
 ) {
-    val profileUiState by viewModel.profileUiState.collectAsState()
-
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
-        Divider()
+        HorizontalDivider()
 
         profileUiState.let {
             ItemProfileComponent(
@@ -102,6 +98,6 @@ fun ProfileBody(
             )
         }
 
-        Divider()
+        HorizontalDivider()
     }
 }

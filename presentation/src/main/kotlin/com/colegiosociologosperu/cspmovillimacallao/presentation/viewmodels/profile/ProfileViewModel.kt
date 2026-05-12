@@ -9,6 +9,7 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.CspA
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,23 +18,20 @@ class ProfileViewModel @Inject constructor(
     private val profileUseCase: ProfileUseCase,
 ) : CspAppViewModel() {
 
-    private val _uiState = MutableStateFlow(false)
-    val uiState: StateFlow<Boolean> = _uiState
-
     private val _profileUiState = MutableStateFlow(ProfileUiState())
-    val profileUiState: StateFlow<ProfileUiState> = _profileUiState
+    val profileUiState: StateFlow<ProfileUiState> = _profileUiState.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _errorMessage = MutableStateFlow("")
-    val errorMessage: StateFlow<String> = _errorMessage
+    val errorMessage: StateFlow<String> = _errorMessage.asStateFlow()
 
     private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     private val _userEmail = MutableStateFlow("")
-    val userEmail: StateFlow<String> = _userEmail
+    val userEmail: StateFlow<String> = _userEmail.asStateFlow()
 
     private val auth = FirebaseAuth.getInstance()
 
@@ -41,15 +39,14 @@ class ProfileViewModel @Inject constructor(
         fetchUserProfileData()
     }
 
-    private fun fetchUserProfileData() {
-        _isLoading.value = true
+    fun fetchUserProfileData() {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val profile = profileUseCase.getProfileData()
                 val currentUser = auth.currentUser
-                _userEmail.value = currentUser?.email.toString()
+                _userEmail.value = currentUser?.email.orEmpty()
                 _profileUiState.value = profile
-                _uiState.value = true
                 Log.d("ProfileViewModel", "profile: ${_profileUiState.value}")
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching profile data: ${e.message}"
@@ -60,8 +57,8 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun refreshProfile() {
-        _isRefreshing.value = true
         viewModelScope.launch {
+            _isRefreshing.value = true
             try {
                 val profile = profileUseCase.getProfileData()
                 _profileUiState.value = profile
@@ -71,5 +68,9 @@ class ProfileViewModel @Inject constructor(
                 _isRefreshing.value = false
             }
         }
+    }
+
+    fun clearErrorMessage() {
+        _errorMessage.value = ""
     }
 }

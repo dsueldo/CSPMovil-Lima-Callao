@@ -6,12 +6,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,39 +24,37 @@ fun ProfileHeader(
     name: String,
     onEditAccount: () -> Unit,
 ) {
-
-    Text(
-        text = "Perfil",
-        style = Typography.headlineMedium,
-        fontWeight = FontWeight.Bold
-    )
-
     Column(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = name,
             textAlign = TextAlign.Center,
-            style = Typography.headlineSmall
+            style = Typography.headlineSmall,
+            color = MaterialTheme.colorScheme.onSurface
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = onEditAccount,
-            colors = ButtonDefaults.textButtonColors(Red_Dark),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Red_Dark,
+                contentColor = Color.White
+            ),
+            shape = MaterialTheme.shapes.medium
         ) {
             Text(
                 text = "Editar Perfil",
-                color = Color.White,
                 style = Typography.bodyMedium
             )
         }
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun ProfileHeaderPreview() {
     ProfileHeader(

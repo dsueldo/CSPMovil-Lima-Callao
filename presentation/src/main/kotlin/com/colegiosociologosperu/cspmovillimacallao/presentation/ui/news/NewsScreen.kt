@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,6 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.colegiosociologosperu.cspmovillimacallao.domain.entities.news.News
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.NewsCard
+import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.NewsCardShimmer
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.news.NewsListViewModel
@@ -106,6 +108,15 @@ fun NewsScreenContent(
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
                 onRefresh = onRefresh,
+                indicator = {
+                    PullToRefreshDefaults.Indicator(
+                        state = rememberPullToRefreshState(),
+                        isRefreshing = isRefreshing,
+                        containerColor = Color.White,
+                        color = Red_Dark,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
+                },
                 modifier = Modifier.fillMaxSize()
             ) {
                 LazyColumn(
@@ -113,24 +124,21 @@ fun NewsScreenContent(
                         .background(MaterialTheme.colorScheme.background)
                         .fillMaxSize()
                 ) {
-                    items(newsList) { news ->
-                        NewsCard(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            news = news,
-                            onNewsClick = onNewsClick
-                        )
+                    if (isLoading && !isRefreshing) {
+                        items(5) {
+                            NewsCardShimmer(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    } else {
+                        items(newsList) { news ->
+                            NewsCard(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                news = news,
+                                onNewsClick = onNewsClick
+                            )
+                        }
                     }
-                }
-            }
-
-            if (isLoading && !isRefreshing) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.12f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = Red_Dark)
                 }
             }
         }

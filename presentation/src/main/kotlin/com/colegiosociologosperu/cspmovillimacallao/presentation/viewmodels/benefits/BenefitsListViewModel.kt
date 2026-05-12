@@ -36,27 +36,28 @@ class BenefitsListViewModel @Inject constructor(
         fetchBenefitsList()
     }
 
-    private fun fetchBenefitsList() {
+    private fun fetchBenefitsList(isRefresh: Boolean = false) {
         viewModelScope.launch {
-            _isLoading.value = true
+            if (isRefresh) {
+                _isRefreshing.value = true
+            } else {
+                _isLoading.value = true
+            }
             try {
                 _benefitsList.value = repository.getAllBenefits()
                 _uiState.value = true
-                _isLoading.value = false
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching benefits: ${e.localizedMessage}"
                 Log.w(TAG, "Error fetching benefits", e)
                 _uiState.value = false
-                _isLoading.value = false
             } finally {
                 _isLoading.value = false
+                _isRefreshing.value = false
             }
         }
     }
 
     fun refreshBenefitsList() {
-        _isRefreshing.value = true
-        fetchBenefitsList()
-        _isRefreshing.value = false
+        fetchBenefitsList(isRefresh = true)
     }
 }

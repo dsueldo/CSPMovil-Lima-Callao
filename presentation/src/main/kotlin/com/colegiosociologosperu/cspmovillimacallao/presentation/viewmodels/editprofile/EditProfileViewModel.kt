@@ -2,13 +2,13 @@ package com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.edi
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.colegiosociologosperu.cspmovillimacallao.domain.entities.user.ProfileUiState
 import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.ProfileUseCase
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.CspAppViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,30 +17,33 @@ class EditProfileViewModel @Inject constructor(
     private val profileUseCase: ProfileUseCase,
 ) : CspAppViewModel() {
 
-    private val _uiState = MutableStateFlow(false)
-    val uiState: StateFlow<Boolean> = _uiState
+    private val _isSaved = MutableStateFlow(false)
+    val isSaved: StateFlow<Boolean> = _isSaved.asStateFlow()
 
     private val _profileUiState = MutableStateFlow(ProfileUiState())
-    val profileUiState: StateFlow<ProfileUiState> = _profileUiState
+    val profileUiState: StateFlow<ProfileUiState> = _profileUiState.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val _errorMessage = MutableStateFlow("")
-    val errorMessage: StateFlow<String> = _errorMessage
-
-    private val auth = FirebaseAuth.getInstance()
-
-    private val currentUser = auth.currentUser
+    val errorMessage: StateFlow<String> = _errorMessage.asStateFlow()
 
     init {
-        getEmail()
+        loadProfileData()
     }
 
-    private fun getEmail() {
-        currentUser?.let {
-            _profileUiState.value = _profileUiState.value.copy(email = it.email.orEmpty())
-            Log.d("EditProfileViewModel", "getEmail: ${it.email}")
+    private fun loadProfileData() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val profile = profileUseCase.getProfileData()
+                _profileUiState.value = profile
+            } catch (e: Exception) {
+                _errorMessage.value = "Error al cargar los datos del perfil"
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 
@@ -81,34 +84,21 @@ class EditProfileViewModel @Inject constructor(
     }
 
     fun saveProfile() {
-        _isLoading.value = true
         viewModelScope.launch {
+            _isLoading.value = true
             try {
-                val currentProfile = profileUseCase.getProfileData() // Debe devolver ProfileUiState
-                val newProfile = _profileUiState.value
-
-                val updatedProfile = currentProfile.copy(
-                    name = newProfile.name.ifBlank { currentProfile.name },
-                    lastName = newProfile.lastName.ifBlank { currentProfile.lastName },
-                    email = newProfile.email.ifBlank { currentProfile.email },
-                    phone = newProfile.phone.ifBlank { currentProfile.phone },
-                    birthday = newProfile.birthday.ifBlank { currentProfile.birthday },
-                    gender = newProfile.gender.ifBlank { currentProfile.gender },
-                    dni = newProfile.dni.ifBlank { currentProfile.dni },
-                    codeNumber = newProfile.codeNumber.ifBlank { currentProfile.codeNumber },
-                    specialized = newProfile.specialized.ifBlank { currentProfile.specialized },
-                    condition = newProfile.condition.ifBlank { currentProfile.condition },
-                    payLastPeriod = newProfile.payLastPeriod.ifBlank { currentProfile.payLastPeriod },
-                )
-                profileUseCase.saveProfileData(updatedProfile)
-                _uiState.value = true
-                Log.d("EditProfileViewModel", "profile: $updatedProfile")
+                profileUseCase.saveProfileData(_profileUiState.value)
+                _isSaved.value = true
+                Log.d("EditProfileViewModel", "profile saved: ${_profileUiState.value}")
             } catch (e: Exception) {
-                _uiState.value = false
                 _errorMessage.value = e.message ?: "Error al guardar el perfil"
             } finally {
                 _isLoading.value = false
             }
         }
+    }
+    
+    fun clearErrorMessage() {
+        _errorMessage.value = ""
     }
 }

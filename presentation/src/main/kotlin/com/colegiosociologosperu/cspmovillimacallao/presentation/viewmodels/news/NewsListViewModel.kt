@@ -34,27 +34,28 @@ class NewsListViewModel @Inject constructor(
         fetchNewsList()
     }
 
-    private fun fetchNewsList() {
+    private fun fetchNewsList(isRefresh: Boolean = false) {
         viewModelScope.launch {
-            _isLoading.value = true
+            if (isRefresh) {
+                _isRefreshing.value = true
+            } else {
+                _isLoading.value = true
+            }
             try {
                 _newsList.value = repository.getAllNews()
                 _uiState.value = true
-                _isLoading.value = false
             } catch (e: Exception) {
                 _errorMessage.value = "Error al cargar las noticias: ${e.localizedMessage}"
                 println("Error fetching news in ViewModel: ${e.localizedMessage}")
                 _uiState.value = false
-                _isLoading.value = false
             } finally {
                 _isLoading.value = false
+                _isRefreshing.value = false
             }
         }
     }
 
     fun refreshNewsList() {
-        _isRefreshing.value = true
-        fetchNewsList()
-        _isRefreshing.value = false
+        fetchNewsList(isRefresh = true)
     }
 }

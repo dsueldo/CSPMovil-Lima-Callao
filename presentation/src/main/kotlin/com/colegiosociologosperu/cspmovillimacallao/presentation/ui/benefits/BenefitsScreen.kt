@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -14,6 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.colegiosociologosperu.cspmovillimacallao.domain.entities.benefits.Benefits
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.BenefitsCard
+import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.BenefitsCardShimmer
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.benefits.BenefitsListViewModel
@@ -84,6 +86,15 @@ fun BenefitsScreenContent(
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
                 onRefresh = onRefresh,
+                indicator = {
+                    PullToRefreshDefaults.Indicator(
+                        state = rememberPullToRefreshState(),
+                        isRefreshing = isRefreshing,
+                        containerColor = Color.White,
+                        color = Red_Dark,
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
+                },
                 modifier = Modifier.fillMaxSize()
             ) {
                 LazyColumn(
@@ -91,24 +102,21 @@ fun BenefitsScreenContent(
                         .background(MaterialTheme.colorScheme.background)
                         .fillMaxSize()
                 ) {
-                    items(benefitsList) { benefits ->
-                        BenefitsCard(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                            benefits = benefits,
-                            onBenefitsClick = { onBenefitsClick(benefits) }
-                        )
+                    if (isLoading && !isRefreshing) {
+                        items(5) {
+                            BenefitsCardShimmer(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                        }
+                    } else {
+                        items(benefitsList) { benefits ->
+                            BenefitsCard(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                benefits = benefits,
+                                onBenefitsClick = { onBenefitsClick(benefits) }
+                            )
+                        }
                     }
-                }
-            }
-
-            if (isLoading && !isRefreshing) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.12f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = Red_Dark)
                 }
             }
         }

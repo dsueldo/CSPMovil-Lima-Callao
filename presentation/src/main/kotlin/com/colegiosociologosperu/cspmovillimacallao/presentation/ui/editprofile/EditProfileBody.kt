@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -18,9 +17,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.editprofile.EditProfileViewModel
 
@@ -34,129 +33,69 @@ fun EditProfileBody(
 
     Column(
         modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.End,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        val textFieldColors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Red_Dark,
+            focusedLabelColor = Red_Dark,
+            cursorColor = Red_Dark
+        )
+
         OutlinedTextField(
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Black,
-                cursorColor = Color.Black
-            ),
             value = profileUiState.name,
             onValueChange = { viewModel.updateName(it) },
-            label = {
-                Text(
-                    text = "Nombres",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
-            placeholder = {
-                Text(
-                    text = "Ingrese sus nombres",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
+            label = { Text("Nombres") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            colors = textFieldColors,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions(onNext = {}),
-            textStyle = Typography.bodySmall
+            textStyle = Typography.bodyMedium
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedTextField(
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Black,
-                cursorColor = Color.Black
-            ),
             value = profileUiState.lastName,
             onValueChange = { viewModel.updateLastName(it) },
-            label = {
-                Text(
-                    text = "Apellidos",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
-            placeholder = {
-                Text(
-                    text = "Ingrese sus apellidos",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
+            label = { Text("Apellidos") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            colors = textFieldColors,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions(onNext = {}),
-            textStyle = Typography.bodySmall
+            textStyle = Typography.bodyMedium
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedTextField(
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Black,
-                cursorColor = Color.Black
-            ),
             value = profileUiState.phone,
             onValueChange = { phone ->
                 if (phone.length <= 9 && phone.all { it.isDigit() }) {
                     viewModel.updatePhoneNumber(phone)
                 }
             },
-            label = {
-                Text(
-                    text = "Celular",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
-            placeholder = {
-                Text(
-                    text = "Ingrese su celular",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            keyboardActions = KeyboardActions(onNext = {}),
-            textStyle = Typography.bodySmall
-        )
-
-        OutlinedTextField(
-            singleLine = true,
+            label = { Text("Celular") },
             modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Black,
-                cursorColor = Color.Black
-            ),
-            value = profileUiState.email,
-            onValueChange = { viewModel.updateEmail(it) },
-            label = {
-                Text(
-                    text = "Correo",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
-            placeholder = {
-                Text(
-                    text = "Ingrese su correo",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            keyboardActions = KeyboardActions(onNext = {}),
-            textStyle = Typography.bodySmall
+            singleLine = true,
+            colors = textFieldColors,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            textStyle = Typography.bodyMedium
         )
 
         Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = profileUiState.email,
+            onValueChange = { viewModel.updateEmail(it) },
+            label = { Text("Correo") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            colors = textFieldColors,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            textStyle = Typography.bodyMedium
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         GenderComponent(
             selectedGender = profileUiState.gender,
@@ -167,143 +106,81 @@ fun EditProfileBody(
             BirthdayComponent(
                 onDateSelected = { formattedDate ->
                     viewModel.updateBirthday(formattedDate)
+                    showBirthdayPicker = false
                 },
                 onDismiss = { showBirthdayPicker = false },
             )
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedTextField(
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Black,
-                cursorColor = Color.Black
-            ),
             value = profileUiState.birthday,
             onValueChange = { },
-            label = {
-                Text(
-                    text = "Cumpleaños",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
-            placeholder = {
-                Text(
-                    text = "Ingrese su cumpleaños",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
+            label = { Text("Cumpleaños") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
             readOnly = true,
+            colors = textFieldColors,
             trailingIcon = {
                 TextButton(onClick = { showBirthdayPicker = true }) {
                     Text(
                         text = "Seleccionar",
-                        color = Color.Black,
-                        style = Typography.bodySmall
+                        color = Red_Dark,
+                        style = Typography.labelLarge
                     )
                 }
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions(onNext = {}),
-            textStyle = Typography.bodySmall
+            textStyle = Typography.bodyMedium
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedTextField(
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Black,
-                cursorColor = Color.Black
-            ),
             value = profileUiState.dni,
             onValueChange = { dni ->
                 if (dni.length <= 8 && dni.all { it.isDigit() }) {
                     viewModel.updateDni(dni)
                 }
             },
-            label = {
-                Text(
-                    text = "DNI",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
-            placeholder = {
-                Text(
-                    text = "Ingrese su DNI",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
+            label = { Text("DNI") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            colors = textFieldColors,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            keyboardActions = KeyboardActions(onNext = {}),
-            textStyle = Typography.bodySmall
+            textStyle = Typography.bodyMedium
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedTextField(
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Black,
-                cursorColor = Color.Black
-            ),
             value = profileUiState.codeNumber,
             onValueChange = { code ->
-                if (code.length <= 4 && code.all { it.isDigit() }) {
+                if (code.length <= 10 && code.all { it.isDigit() }) {
                     viewModel.updateCodeNumber(code)
                 }
             },
-            label = {
-                Text(
-                    text = "Número de Colegiatura",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
-            placeholder = {
-                Text(
-                    text = "Ingrese su Número de Colegiatura",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
+            label = { Text("Número de Colegiatura") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            colors = textFieldColors,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            keyboardActions = KeyboardActions(onNext = {}),
-            textStyle = Typography.bodySmall
+            textStyle = Typography.bodyMedium
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedTextField(
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Black,
-                unfocusedBorderColor = Color.Black,
-                cursorColor = Color.Black
-            ),
             value = profileUiState.specialized,
             onValueChange = { viewModel.updateSpecialized(it) },
-            label = {
-                Text(
-                    text = "Especialidad",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
-            placeholder = {
-                Text(
-                    text = "Ingrese su Especialidad",
-                    style = Typography.bodySmall,
-                    color = Color.Black,
-                )
-            },
+            label = { Text("Especialidad") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            colors = textFieldColors,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-            keyboardActions = KeyboardActions(onNext = {}),
-            textStyle = Typography.bodySmall
+            textStyle = Typography.bodyMedium
         )
+        
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }

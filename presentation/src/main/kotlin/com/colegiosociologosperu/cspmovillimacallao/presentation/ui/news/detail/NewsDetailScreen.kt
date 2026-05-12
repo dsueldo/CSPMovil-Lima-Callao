@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -39,6 +40,7 @@ import androidx.navigation.NavController
 import com.colegiosociologosperu.cspmovillimacallao.domain.entities.news.News
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.ZoomableAsyncImage
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
+import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.news.detail.NewsDetailViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -88,7 +90,13 @@ fun NewsDetailContent(
             modifier = modifier,
             topBar = {
                 TopAppBar(
-                    title = { Text("Detalle de la noticia") },
+                    title = {
+                        Text(
+                            text = "Detalle de la noticia",
+                            style = Typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
                             Icon(

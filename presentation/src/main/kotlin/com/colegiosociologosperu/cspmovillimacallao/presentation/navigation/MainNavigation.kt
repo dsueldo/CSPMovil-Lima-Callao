@@ -103,12 +103,18 @@ fun MainNavigation(
                 val title = backStackEntry.arguments?.getString("title") ?: ""
                 PaymentInstructionScreen(navController, title)
             }
-            composable("profile") { ProfileScreen(
-                onSignOut,
-                onDeleteAccount,
-                navController,
-            ) }
-            composable("contact") { ContactScreen(navController) }
+            composable("profile") {
+                ProfileScreen(
+                    onSignOut = onSignOut,
+                    navController = navController
+                )
+            }
+            composable("contact") { 
+                ContactScreen(
+                    navController = navController,
+                    onDeleteAccount = onDeleteAccount
+                ) 
+            }
             composable("editProfile") { EditProfileScreen(navController) }
             composable(
                 "news/{newsId}",
