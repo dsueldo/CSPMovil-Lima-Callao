@@ -3,106 +3,150 @@ package com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
-import com.google.accompanist.swiperefresh.SwipeRefreshState
-import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.NewsRepository
+import com.colegiosociologosperu.cspmovillimacallao.domain.entities.news.News
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.NewsCard
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
-import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.factories.NewsListViewModelFactory
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.news.NewsListViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewsScreen(
     navController: NavHostController,
-    newsRepository: NewsRepository,
+    viewModel: NewsListViewModel = hiltViewModel(),
 ) {
-    val viewModel: NewsListViewModel = viewModel(
-        factory = remember { NewsListViewModelFactory(newsRepository) }
-    )
     val newsList by viewModel.newsList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-    if (isLoading) {
-        BasicAlertDialog (
-            onDismissRequest = { },
-            content = {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = Red_Dark
-                    )
-                }
-            },
-        )
-    }
+    NewsScreenContent(
+        newsList = newsList,
+        isLoading = isLoading,
+        isRefreshing = isRefreshing,
+        onRefresh = { viewModel.refreshNewsList() },
+        onNewsClick = { news ->
+            navController.navigate("news/${news.id}")
+        }
+    )
+}
 
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxSize(),
-    ) {
-        Text(
-            text = "Noticias",
-            style = Typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
-        SwipeRefresh(
-            state = SwipeRefreshState(isRefreshing),
-            onRefresh = { viewModel.refreshNewsList() },
-            indicator = { state, trigger ->
-                SwipeRefreshIndicator(
-                    state = state,
-                    refreshTriggerDistance = trigger,
-                    scale = true,
-                    contentColor = Red_Dark,
+@OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun NewsScreenContent(
+    newsList: List<News>,
+    isLoading: Boolean,
+    isRefreshing: Boolean,
+    onRefresh: () -> Unit,
+    onNewsClick: (News) -> Unit
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Noticias",
+                        style = Typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
-            }
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background)
-                    .fillMaxSize()
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = onRefresh,
+                modifier = Modifier.fillMaxSize()
             ) {
-                items(newsList) { news ->
-                    NewsCard(
-                        modifier = Modifier.padding(
-                            vertical = 8.dp,
-                            horizontal = 0.dp
-                        ),
-                        news = news
-                    ) {
-                        navController.navigate("news/${news.id}")
+                LazyColumn(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.background)
+                        .fillMaxSize()
+                ) {
+                    items(newsList) { news ->
+                        NewsCard(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            news = news,
+                            onNewsClick = onNewsClick
+                        )
                     }
                 }
             }
+
+            if (isLoading && !isRefreshing) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Red_Dark)
+                }
+            }
         }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(showBackground = true)
+@Composable
+fun NewsScreenPreview() {
+    val mockNews = listOf(
+        News(
+            id = "1",
+            title = "Nueva app lanzada",
+            description = "Se ha lanzado la nueva aplicación del Colegio de Sociólogos del Perú.",
+            date = "2024-10-27T10:00:00Z",
+            source = "CSP"
+        ),
+        News(
+            id = "2",
+            title = "Evento anual",
+            description = "Invitamos a todos los colegiados al evento anual de integración.",
+            date = "2024-10-26T09:00:00Z",
+            source = "CSP"
+        )
+    )
+    MaterialTheme {
+        NewsScreenContent(
+            newsList = mockNews,
+            isLoading = false,
+            isRefreshing = false,
+            onRefresh = {},
+            onNewsClick = {}
+        )
     }
 }

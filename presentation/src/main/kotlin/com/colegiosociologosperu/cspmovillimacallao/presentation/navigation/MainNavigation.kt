@@ -1,13 +1,15 @@
 package com.colegiosociologosperu.cspmovillimacallao.presentation.navigation
 
-import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -20,8 +22,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.colegiosociologosperu.cspmovillimacallao.data.repositories.BenefitsRepositoryImpl
-import com.colegiosociologosperu.cspmovillimacallao.data.repositories.NewsRepositoryImpl
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.benefits.BenefitsScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.benefits.detail.BenefitsDetailScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.contact.ContactScreen
@@ -33,28 +33,25 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.payment.inst
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.profile.ProfileScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 
-@SuppressLint("RestrictedApi")
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MainNavigation(
     onSignOut: () -> Unit,
     onDeleteAccount: () -> Unit,
 ) {
-
-    val newsRepository = NewsRepositoryImpl()
-    val benefitsRepository = BenefitsRepositoryImpl()
     val navController = rememberNavController()
 
     Scaffold(
         modifier = Modifier.systemBarsPadding(),
         bottomBar = {
-            BottomNavigation(
-                backgroundColor = Red_Dark,
+            NavigationBar(
+                containerColor = Red_Dark,
                 contentColor = Color.White
             ) {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
                 topLevelRoutes.forEach { topLevelRoute ->
-                    BottomNavigationItem(
+                    NavigationBarItem(
                         icon = {
                             Icon(
                                 topLevelRoute.icon,
@@ -63,7 +60,7 @@ fun MainNavigation(
                         },
                         label = { Text(topLevelRoute.name) },
                         selected = currentDestination?.hierarchy?.any {
-                            it.hasRoute(topLevelRoute.route.toString(), arguments = null)
+                            it.route == topLevelRoute.route
                         } == true,
                         onClick = {
                             navController.navigate(topLevelRoute.route) {
@@ -73,7 +70,14 @@ fun MainNavigation(
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = Color.White,
+                            selectedTextColor = Color.White,
+                            unselectedIconColor = Color.White.copy(alpha = 0.6f),
+                            unselectedTextColor = Color.White.copy(alpha = 0.6f),
+                            indicatorColor = Color.White.copy(alpha = 0.2f)
+                        )
                     )
                 }
             }
@@ -85,10 +89,10 @@ fun MainNavigation(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("news") {
-                NewsScreen(navController = navController, newsRepository = newsRepository)
+                NewsScreen(navController = navController)
             }
             composable("benefit") {
-                BenefitsScreen(navController = navController, benefitsRepository = benefitsRepository)
+                BenefitsScreen(navController = navController)
             }
             composable("payment") { PaymentOneScreen(navController) }
             composable(

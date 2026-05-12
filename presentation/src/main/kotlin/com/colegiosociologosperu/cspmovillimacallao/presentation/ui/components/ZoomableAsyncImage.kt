@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -49,67 +50,78 @@ fun ZoomableAsyncImage(
     val animatedOffsetX by animateFloatAsState(targetValue = if (scale == 1f) 0f else offsetX)
     val animatedOffsetY by animateFloatAsState(targetValue = if (scale == 1f) 0f else offsetY)
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(backgroundColor)
-            .pointerInput(Unit) {
-                detectTransformGestures { _, pan, zoom, _ ->
-                    scale = (scale * zoom).coerceIn(minScale, maxScale)
-                    if (scale > 1f) {
-                        offsetX += pan.x
-                        offsetY += pan.y
-                    } else {
-                        offsetX = 0f
-                        offsetY = 0f
-                    }
-                }
-            }
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onDoubleTap = {
-                        scale = if (scale > minScale) minScale else doubleTapZoomScale
-                        offsetX = 0f
-                        offsetY = 0f
-                    }
-                )
-            }
     ) {
-        if (isImageLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center),
-                color = closeIconColor
-            )
-        }
+        val width = constraints.maxWidth.toFloat()
+        val height = constraints.maxHeight.toFloat()
 
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = contentDescription,
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .graphicsLayer {
-                    scaleX = animatedScale
-                    scaleY = animatedScale
-                    translationX = animatedOffsetX
-                    translationY = animatedOffsetY
-                },
-            contentScale = contentScale,
-            onLoading = { isImageLoading = true },
-            onSuccess = { isImageLoading = false },
-            onError = { isImageLoading = false }
-        )
+                .pointerInput(Unit) {
+                    detectTransformGestures { _, pan, zoom, _ ->
+                        scale = (scale * zoom).coerceIn(minScale, maxScale)
+                        if (scale > 1f) {
+                            val maxOffsetX = (scale - 1f) * width / 2
+                            val maxOffsetY = (scale - 1f) * height / 2
 
-        IconButton(
-            onClick = onClose,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp)
+                            offsetX = (offsetX + pan.x * scale).coerceIn(-maxOffsetX, maxOffsetX)
+                            offsetY = (offsetY + pan.y * scale).coerceIn(-maxOffsetY, maxOffsetY)
+                        } else {
+                            offsetX = 0f
+                            offsetY = 0f
+                        }
+                    }
+                }
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onDoubleTap = {
+                            scale = if (scale > minScale) minScale else doubleTapZoomScale
+                            offsetX = 0f
+                            offsetY = 0f
+                        }
+                    )
+                }
         ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Close",
-                tint = closeIconColor
+            if (isImageLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = closeIconColor
+                )
+            }
+
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = contentDescription,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer {
+                        scaleX = animatedScale
+                        scaleY = animatedScale
+                        translationX = animatedOffsetX
+                        translationY = animatedOffsetY
+                    },
+                contentScale = contentScale,
+                onLoading = { isImageLoading = true },
+                onSuccess = { isImageLoading = false },
+                onError = { isImageLoading = false }
             )
+
+            IconButton(
+                onClick = onClose,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close",
+                    tint = closeIconColor
+                )
+            }
         }
     }
 }
