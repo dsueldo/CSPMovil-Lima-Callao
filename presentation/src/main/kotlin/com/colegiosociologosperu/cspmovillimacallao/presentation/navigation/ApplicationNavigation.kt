@@ -29,6 +29,11 @@ import androidx.compose.ui.unit.dp
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.admin.AdminScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 import com.colegiosociologosperu.cspmovillimacallao.presentation.R
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+
+import com.google.firebase.auth.FirebaseAuth
+import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.CheckForUpdates
 
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("RestrictedApi")
@@ -39,11 +44,23 @@ fun ApplicationNavigation(
     val userRole by splashViewModel.userRole
     val isLoading by splashViewModel.isLoading
     var isAuthenticated by remember { mutableStateOf(splashViewModel.hasUser()) }
+    val navController = rememberNavController()
+
+    var showUpdateCheck by remember { mutableStateOf(false) }
 
     LaunchedEffect(isAuthenticated) {
         if (isAuthenticated) {
             splashViewModel.checkUserStatus()
+            showUpdateCheck = true
         }
+    }
+
+    if (showUpdateCheck) {
+        CheckForUpdates(
+            onDismiss = {
+                showUpdateCheck = false
+            }
+        )
     }
 
     if (isLoading && isAuthenticated) {
@@ -70,25 +87,38 @@ fun ApplicationNavigation(
             }
         }
     } else if (isAuthenticated) {
-        if (userRole == "admin") {
-            AdminScreen(
-                navController = rememberNavController(),
-                onSignOut = {
-                    splashViewModel.signOut()
-                    isAuthenticated = false
-                }
-            )
-        } else {
-            MainNavigation(
-                onSignOut = {
-                    splashViewModel.signOut()
-                    isAuthenticated = false
-                },
-                onDeleteAccount = {
-                    splashViewModel.deleteAccount()
-                    isAuthenticated = false
-                }
-            )
+        NavHost(
+            navController = navController,
+            startDestination = if (userRole == "admin") "admin" else "main"
+        ) {
+            composable("admin") {
+                AdminScreen(
+                    navController = navController,
+                    onSignOut = {
+                        splashViewModel.signOut()
+                        isAuthenticated = false
+                    }
+                )
+            }
+            composable("main") {
+                MainNavigation(
+                    onSignOut = {
+                        splashViewModel.signOut()
+                        isAuthenticated = false
+                    },
+                    onDeleteAccount = {
+                        splashViewModel.deleteAccount()
+                        isAuthenticated = false
+                    },
+                    onNavigateToAdmin = {
+                        navController.navigate("admin") {
+                            popUpTo("main") { inclusive = false }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+            // For admin to go to News, we can just navigate to "main"
         }
     } else {
         AuthNavigation(onAuthComplete = { 

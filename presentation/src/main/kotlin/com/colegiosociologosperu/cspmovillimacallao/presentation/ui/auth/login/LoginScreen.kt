@@ -37,6 +37,7 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.navigation.Sign
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.auth.signIn.SignInViewModel
 import com.colegiosociologosperu.cspmovillimacallao.presentation.R
+import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.CheckForUpdates
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,9 +64,19 @@ fun LoginScreen(
 
     val errorPasswordValidationMessage by signInViewModel.errorMessage.collectAsState()
 
+    var showUpdateCheck by remember { mutableStateOf(false) }
 
     if (uiState) {
-        onAuthComplete()
+        showUpdateCheck = true
+    }
+
+    if (showUpdateCheck) {
+        CheckForUpdates(
+            onDismiss = {
+                showUpdateCheck = false
+                onAuthComplete()
+            }
+        )
     }
 
     if (isLoading) {

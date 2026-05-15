@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -120,5 +121,23 @@ fun BenefitsScreenContent(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BenefitsScreenPreview() {
+    val mockBenefits = listOf(
+        Benefits(id = "1", title = "Convenio 1", content = "Descripción 1"),
+        Benefits(id = "2", title = "Convenio 2", content = "Descripción 2")
+    )
+    MaterialTheme {
+        BenefitsScreenContent(
+            benefitsList = mockBenefits,
+            isLoading = false,
+            isRefreshing = false,
+            onRefresh = {},
+            onBenefitsClick = {}
+        )
     }
 }

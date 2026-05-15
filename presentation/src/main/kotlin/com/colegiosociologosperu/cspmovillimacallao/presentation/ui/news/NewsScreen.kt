@@ -9,21 +9,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,34 +29,83 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.colegiosociologosperu.cspmovillimacallao.domain.entities.news.News
+import com.colegiosociologosperu.cspmovillimacallao.domain.entities.user.ProfileUiState
+import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.admin.components.AdminDrawerContent
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.NewsCard
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.NewsCardShimmer
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.news.NewsListViewModel
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun NewsScreen(
     navController: NavHostController,
+    onNavigateToAdmin: () -> Unit = {},
     viewModel: NewsListViewModel = hiltViewModel(),
 ) {
     val newsList by viewModel.newsList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val adminProfile by viewModel.adminProfile.collectAsState()
 
-    NewsScreenContent(
-        newsList = newsList,
-        isLoading = isLoading,
-        isRefreshing = isRefreshing,
-        onRefresh = { viewModel.refreshNewsList() },
-        onNewsClick = { news ->
-            navController.navigate("news/${news.id}")
-        },
-        onFavoritesClick = {
-            navController.navigate("favorites")
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    if (adminProfile?.role == "admin") {
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                AdminDrawerContent(
+                    admin = adminProfile,
+                    selectedRoute = "news",
+                    onNavigateToAdmin = {
+                        scope.launch {
+                            drawerState.close()
+                            onNavigateToAdmin()
+                        }
+                    },
+                    onNavigateToNews = {
+                        scope.launch { drawerState.close() }
+                    }
+                )
+            }
+        ) {
+            NewsScreenContent(
+                newsList = newsList,
+                isLoading = isLoading,
+                isRefreshing = isRefreshing,
+                isAdmin = true,
+                onRefresh = { viewModel.refreshNewsList() },
+                onOpenDrawer = { scope.launch { drawerState.open() } },
+                onNewsClick = { news ->
+                    navController.navigate("news/${news.id}")
+                },
+                onFavoritesClick = {
+                    navController.navigate("favorites")
+                },
+                onAddNewsClick = {
+                    navController.navigate("addNews")
+                }
+            )
         }
-    )
+    } else {
+        NewsScreenContent(
+            newsList = newsList,
+            isLoading = isLoading,
+            isRefreshing = isRefreshing,
+            isAdmin = false,
+            onRefresh = { viewModel.refreshNewsList() },
+            onOpenDrawer = {},
+            onNewsClick = { news ->
+                navController.navigate("news/${news.id}")
+            },
+            onFavoritesClick = {
+                navController.navigate("favorites")
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,9 +115,12 @@ fun NewsScreenContent(
     newsList: List<News>,
     isLoading: Boolean,
     isRefreshing: Boolean,
+    isAdmin: Boolean,
     onRefresh: () -> Unit,
+    onOpenDrawer: () -> Unit,
     onNewsClick: (News) -> Unit,
-    onFavoritesClick: () -> Unit
+    onFavoritesClick: () -> Unit,
+    onAddNewsClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -84,7 +132,26 @@ fun NewsScreenContent(
                         fontWeight = FontWeight.Bold
                     )
                 },
+                navigationIcon = {
+                    if (isAdmin) {
+                        IconButton(onClick = onOpenDrawer) {
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Menu"
+                            )
+                        }
+                    }
+                },
                 actions = {
+                    if (isAdmin) {
+                        IconButton(onClick = onAddNewsClick) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Agregar Noticia",
+                                tint = Red_Dark
+                            )
+                        }
+                    }
                     IconButton(onClick = onFavoritesClick) {
                         Icon(
                             imageVector = Icons.Default.Star,
@@ -170,7 +237,9 @@ fun NewsScreenPreview() {
             newsList = mockNews,
             isLoading = false,
             isRefreshing = false,
+            isAdmin = true,
             onRefresh = {},
+            onOpenDrawer = {},
             onNewsClick = {},
             onFavoritesClick = {}
         )

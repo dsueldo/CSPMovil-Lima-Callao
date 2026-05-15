@@ -81,6 +81,8 @@ dependencies {
     implementation(libs.firebase.realtime)
     implementation(libs.firebase.config)
     implementation(libs.java.jwt)
+    implementation(libs.play.app.update)
+    implementation(libs.play.app.update.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

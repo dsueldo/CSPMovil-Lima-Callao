@@ -1,6 +1,7 @@
 package com.colegiosociologosperu.cspmovillimacallao.presentation.ui.editprofile
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
@@ -80,7 +81,9 @@ fun BirthdayComponent(
                     onDateSelected(formattedDate)
                 }
                 onDismiss()
-            }) {
+            },
+                colors = ButtonDefaults.textButtonColors(contentColor = Red_Dark)
+            ){
                 Text(text = "OK", color = Color.Black)
             }
         },

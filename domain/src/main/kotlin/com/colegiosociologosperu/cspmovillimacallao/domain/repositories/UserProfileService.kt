@@ -5,4 +5,6 @@ import com.colegiosociologosperu.cspmovillimacallao.domain.entities.user.Profile
 interface UserProfileService {
     suspend fun getProfile(): ProfileUiState
     suspend fun saveProfile(profile: ProfileUiState)
+    suspend fun getAllUsers(): List<ProfileUiState>
+    suspend fun updateOtherUserProfile(uid: String, profile: ProfileUiState)
 }

@@ -37,8 +37,8 @@ android {
         applicationId = "com.colegiosociologosperu.cspmovillimacallao"
         minSdk = 24
         targetSdk = 35
-        versionCode = 14
-        versionName = "1.5"
+        versionCode = 15
+        versionName = "1.6"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -127,6 +127,8 @@ dependencies {
     implementation(libs.firebase.appcheck.debug)
 
     implementation(libs.androidx.security.crypto.ktx.v110alpha06)
+    implementation(libs.play.app.update)
+    implementation(libs.play.app.update.ktx)
     implementation(project(":presentation"))
     implementation(project(":domain"))
     implementation(project(":data"))

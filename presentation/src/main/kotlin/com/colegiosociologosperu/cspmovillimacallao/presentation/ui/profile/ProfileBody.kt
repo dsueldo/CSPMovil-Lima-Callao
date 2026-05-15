@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.colegiosociologosperu.cspmovillimacallao.domain.entities.user.ProfileUiState
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.ItemProfileComponent
@@ -126,4 +127,24 @@ private fun ProfileSection(
             }
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProfileBodyPreview() {
+    ProfileBody(
+        profileUiState = ProfileUiState(
+            name = "Christian",
+            lastName = "Quispe",
+            phone = "987654321",
+            gender = "Masculino",
+            birthday = "01/01/1990",
+            dni = "12345678",
+            codeNumber = "4567",
+            specialized = "Sociología",
+            condition = "Habilitado",
+            payLastPeriod = "2024-I"
+        ),
+        email = "christian@example.com"
+    )
 }

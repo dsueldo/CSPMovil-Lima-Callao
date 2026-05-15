@@ -27,6 +27,7 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.benefits.det
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.contact.ContactScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.editprofile.EditProfileScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news.NewsScreen
+import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news.add.AddNewsScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news.detail.NewsDetailScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.news.favorites.FavoritesScreen
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.payment.PaymentOneScreen
@@ -39,6 +40,7 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red
 fun MainNavigation(
     onSignOut: () -> Unit,
     onDeleteAccount: () -> Unit,
+    onNavigateToAdmin: () -> Unit = {}
 ) {
     val navController = rememberNavController()
 
@@ -90,7 +92,10 @@ fun MainNavigation(
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("news") {
-                NewsScreen(navController = navController)
+                NewsScreen(
+                    navController = navController,
+                    onNavigateToAdmin = onNavigateToAdmin
+                )
             }
             composable("benefit") {
                 BenefitsScreen(navController = navController)
@@ -132,6 +137,9 @@ fun MainNavigation(
             }
             composable("favorites") {
                 FavoritesScreen(navController = navController)
+            }
+            composable("addNews") {
+                AddNewsScreen(navController = navController)
             }
         }
     }

@@ -8,4 +8,7 @@ interface NewsRepository {
     suspend fun toggleFavorite(newsId: String)
     suspend fun isFavorite(newsId: String): Boolean
     suspend fun getFavoriteNews(): List<News>
+    suspend fun addNews(news: News)
+    suspend fun updateNews(news: News)
+    suspend fun deleteNews(newsId: String)
 }

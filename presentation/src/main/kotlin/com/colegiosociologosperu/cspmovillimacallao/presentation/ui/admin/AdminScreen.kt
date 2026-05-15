@@ -1,221 +1,126 @@
 package com.colegiosociologosperu.cspmovillimacallao.presentation.ui.admin
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.colegiosociologosperu.cspmovillimacallao.domain.entities.user.ProfileUiState
+import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.admin.components.AdminBody
+import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.admin.components.AdminDrawerContent
+import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.admin.components.AdminHeader
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
-import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
+import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.admin.AdminViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminScreen(
     navController: NavController,
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    viewModel: AdminViewModel = hiltViewModel()
 ) {
+    val users by viewModel.filteredUsers.collectAsState(initial = emptyList())
+    val adminProfile by viewModel.adminProfile.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val isLoading by viewModel.loading.collectAsState()
+    
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    var searchQuery by remember { mutableStateOf("") }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet(
-                drawerContainerColor = Color.White,
-                modifier = Modifier.width(300.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxHeight()
-                ) {
-                    Text(
-                        text = "Buscar Usuarios",
-                        style = Typography.headlineSmall,
-                        color = Red_Dark,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Nombre o DNI") },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Red_Dark,
-                            focusedLabelColor = Red_Dark,
-                            cursorColor = Red_Dark
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Resultados de búsqueda",
-                        style = Typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                    // Aquí se mostraría la lista de usuarios encontrados
-                    Text(
-                        text = "Escribe para empezar a buscar...",
-                        style = Typography.bodyMedium,
-                        color = Color.Gray
-                    )
-                }
-            }
-        }
-    ) {
-        Scaffold(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
-                .fillMaxSize(),
-            topBar = {
-                AdminHeader(
-                    onMenuClick = {
-                        scope.launch { drawerState.open() }
-                    }
-                )
-            },
-            bottomBar = {
-                AdminFooter(
-                    onSignOut = onSignOut
-                )
-            }
-        ) { paddingValues ->
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(horizontal = 16.dp)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Bienvenido al Panel",
-                    style = Typography.headlineSmall,
-                    color = Color.Black
-                )
-                Text(
-                    text = "ADMINISTRADOR",
-                    style = Typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Red_Dark
-                )
-                Spacer(modifier = Modifier.height(32.dp))
-                
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "¿Qué deseas hacer hoy?",
-                            style = Typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Button(
-                            onClick = { /* Navegar a agregar info */ },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = Red_Dark),
-                            shape = MaterialTheme.shapes.medium
-                        ) {
-                            Text(
-                                "AGREGAR INFORMACIÓN",
-                                modifier = Modifier.padding(vertical = 8.dp),
-                                style = Typography.bodyLarge,
-                                fontWeight = FontWeight.Bold
-                            )
+            AdminDrawerContent(
+                admin = adminProfile,
+                selectedRoute = "admin",
+                onNavigateToAdmin = {
+                    scope.launch { drawerState.close() }
+                },
+                onNavigateToNews = {
+                    scope.launch { 
+                        drawerState.close()
+                        navController.navigate("main") {
+                            launchSingleTop = true
                         }
                     }
                 }
-            }
+            )
         }
+    ) {
+        AdminScreenContent(
+            users = users,
+            searchQuery = searchQuery,
+            isLoading = isLoading,
+            onOpenDrawer = { scope.launch { drawerState.open() } },
+            onSignOut = onSignOut,
+            onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
+            onUpdateUser = { uid, spec, cond, pay ->
+                viewModel.updateProfessionalInfo(uid, spec, cond, pay)
+            }
+        )
     }
 }
 
 @Composable
-fun AdminHeader(onMenuClick: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onMenuClick) {
-                Icon(
-                    Icons.Default.Menu,
-                    contentDescription = "Abrir Buscador",
-                    tint = Red_Dark,
-                    modifier = Modifier.size(32.dp)
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = "ADMINISTRACIÓN",
-                style = Typography.titleLarge,
-                fontWeight = FontWeight.ExtraBold,
-                color = Red_Dark
+fun AdminScreenContent(
+    users: List<ProfileUiState>,
+    searchQuery: String,
+    isLoading: Boolean,
+    onOpenDrawer: () -> Unit,
+    onSignOut: () -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    onUpdateUser: (uid: String, specialized: String, condition: String, payLastPeriod: String) -> Unit,
+) {
+    Scaffold(
+        topBar = {
+            AdminHeader(
+                onOpenDrawer = onOpenDrawer,
+                onSignOut = onSignOut
             )
         }
-        HorizontalDivider(color = Red_Dark, thickness = 2.dp, modifier = Modifier.padding(top = 8.dp))
-    }
-}
-
-@Composable
-fun AdminFooter(onSignOut: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Button(
-            onClick = onSignOut,
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Red_Dark,
-                contentColor = Color.White
-            ),
-            shape = MaterialTheme.shapes.medium
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            Text(
-                "CERRAR SESIÓN",
-                modifier = Modifier.padding(vertical = 8.dp),
-                style = Typography.bodyLarge,
-                fontWeight = FontWeight.Bold
+            AdminBody(
+                users = users,
+                searchQuery = searchQuery,
+                onSearchQueryChange = onSearchQueryChange,
+                onUpdateUser = onUpdateUser
             )
+
+            if (isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Red_Dark)
+                }
+            }
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun AdminScreenPreview() {
-    AdminScreen(
-        navController = rememberNavController(),
-        onSignOut = {}
+fun AdminScreenPreview() {
+    AdminScreenContent(
+        users = listOf(
+            ProfileUiState(name = "Christian", lastName = "Quispe", dni = "12345678"),
+            ProfileUiState(name = "Juan", lastName = "Perez", dni = "87654321")
+        ),
+        searchQuery = "",
+        isLoading = false,
+        onOpenDrawer = {},
+        onSignOut = {},
+        onSearchQueryChange = {},
+        onUpdateUser = { _, _, _, _ -> }
     )
 }

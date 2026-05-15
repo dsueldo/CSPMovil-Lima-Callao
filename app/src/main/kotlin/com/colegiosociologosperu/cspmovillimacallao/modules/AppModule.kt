@@ -1,8 +1,8 @@
 package com.colegiosociologosperu.cspmovillimacallao.modules
 
-import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.BenefitsRepository
-import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.NewsRepository
 import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.UserProfileService
+import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.BenefitsUseCase
+import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.NewsUseCase
 import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.ProfileUseCase
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.benefits.BenefitsListViewModel
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.benefits.detail.BenefitsDetailViewModel
@@ -27,20 +27,20 @@ object AppModule {
     fun provideEditProfileViewModel(profileUseCase: ProfileUseCase,): EditProfileViewModel = EditProfileViewModel(profileUseCase)
 
     @Provides
-    fun provideNewsListViewModel(repository: NewsRepository): NewsListViewModel = NewsListViewModel(repository)
+    fun provideNewsListViewModel(newsUseCase: NewsUseCase, profileUseCase: ProfileUseCase): NewsListViewModel = NewsListViewModel(newsUseCase, profileUseCase)
 
     @Provides
-    fun provideNewsDetailViewModel(repository: NewsRepository): NewsDetailViewModel = NewsDetailViewModel(repository)
+    fun provideNewsDetailViewModel(useCase: NewsUseCase, profileUseCase: ProfileUseCase): NewsDetailViewModel = NewsDetailViewModel(useCase, profileUseCase)
 
     @Provides
-    fun provideNewsListViewModelFactory(repository: NewsRepository): NewsListViewModelFactory = NewsListViewModelFactory(repository)
+    fun provideNewsListViewModelFactory(newsUseCase: NewsUseCase, profileUseCase: ProfileUseCase): NewsListViewModelFactory = NewsListViewModelFactory(newsUseCase, profileUseCase)
 
     @Provides
-    fun provideBenefitsListViewModel(repository: BenefitsRepository): BenefitsListViewModel = BenefitsListViewModel(repository)
+    fun provideBenefitsListViewModel(useCase: BenefitsUseCase): BenefitsListViewModel = BenefitsListViewModel(useCase)
 
     @Provides
-    fun provideBenefitsDetailViewModel(repository: BenefitsRepository): BenefitsDetailViewModel = BenefitsDetailViewModel(repository)
+    fun provideBenefitsDetailViewModel(useCase: BenefitsUseCase): BenefitsDetailViewModel = BenefitsDetailViewModel(useCase)
 
     @Provides
-    fun provideBenefitsListViewModelFactory(repository: BenefitsRepository): BenefitsListViewModelFactory = BenefitsListViewModelFactory(repository)
+    fun provideBenefitsListViewModelFactory(useCase: BenefitsUseCase): BenefitsListViewModelFactory = BenefitsListViewModelFactory(useCase)
 }

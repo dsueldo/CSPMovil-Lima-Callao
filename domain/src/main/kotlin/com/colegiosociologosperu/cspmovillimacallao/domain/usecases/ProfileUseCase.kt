@@ -14,4 +14,12 @@ class ProfileUseCase @Inject constructor(
     suspend fun saveProfileData(profile: ProfileUiState) {
         return userProfileService.saveProfile(profile)
     }
+
+    suspend fun getAllUsers(): List<ProfileUiState> {
+        return userProfileService.getAllUsers()
+    }
+
+    suspend fun updateOtherUserProfile(uid: String, profile: ProfileUiState) {
+        userProfileService.updateOtherUserProfile(uid, profile)
+    }
 }

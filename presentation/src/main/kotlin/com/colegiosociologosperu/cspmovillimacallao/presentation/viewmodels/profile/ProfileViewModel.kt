@@ -1,21 +1,22 @@
 package com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.profile
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.colegiosociologosperu.cspmovillimacallao.domain.entities.user.ProfileUiState
+import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.AuthUseCase
 import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.ProfileUseCase
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.CspAppViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val profileUseCase: ProfileUseCase,
+    private val authUseCase: AuthUseCase
 ) : CspAppViewModel() {
 
     private val _profileUiState = MutableStateFlow(ProfileUiState())
@@ -33,8 +34,6 @@ class ProfileViewModel @Inject constructor(
     private val _userEmail = MutableStateFlow("")
     val userEmail: StateFlow<String> = _userEmail.asStateFlow()
 
-    private val auth = FirebaseAuth.getInstance()
-
     init {
         fetchUserProfileData()
     }
@@ -44,10 +43,9 @@ class ProfileViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 val profile = profileUseCase.getProfileData()
-                val currentUser = auth.currentUser
-                _userEmail.value = currentUser?.email.orEmpty()
+                val user = authUseCase.currentUser.first()
+                _userEmail.value = user?.email.orEmpty()
                 _profileUiState.value = profile
-                Log.d("ProfileViewModel", "profile: ${_profileUiState.value}")
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching profile data: ${e.message}"
             } finally {

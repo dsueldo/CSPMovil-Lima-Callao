@@ -45,11 +45,14 @@ class NewsRepositoryImpl @Inject constructor(
 
     override suspend fun getNewsDetail(newsId: String): News {
         return try {
-            firestore.collection("news")
+            val document = firestore.collection("news")
                 .document(newsId)
                 .get()
                 .await()
-                .toObject(News::class.java) ?: throw Exception("News not found")
+            
+            document.toObject(News::class.java)?.apply {
+                id = document.id
+            } ?: throw Exception("News not found")
         } catch (e: Exception) {
             println("Error fetching news detail for $newsId: ${e.localizedMessage}")
             throw e
@@ -77,5 +80,89 @@ class NewsRepositoryImpl @Inject constructor(
         
         val allNews = getAllNews()
         return allNews.filter { favoriteIds.contains(it.id) }
+    }
+
+    override suspend fun addNews(news: News) {
+        try {
+            // Find the current maximum order
+            val querySnapshot = firestore.collection("news")
+                .orderBy("order", Query.Direction.DESCENDING)
+                .limit(10) // Check first few to skip outliers if necessary
+                .get()
+                .await()
+
+            // Filter out the outlier order if it exists (e.g. the 7066... one)
+            val lastNews = querySnapshot.documents.firstOrNull { 
+                val order = it.getLong("order") ?: 0
+                order < 1000000 // Reasonable threshold for normal order
+            }
+            
+            val nextOrder = ((lastNews?.getLong("order") ?: 0L) + 1).toInt()
+            val nextId = "news${numberToWords(nextOrder)}"
+
+            val newsMap = hashMapOf(
+                "image" to news.image,
+                "title" to news.title,
+                "content" to news.content,
+                "description" to news.description,
+                "order" to nextOrder,
+                "source" to news.source,
+                "date" to news.date,
+                "id" to nextId
+            )
+            firestore.collection("news").document(nextId).set(newsMap).await()
+        } catch (e: Exception) {
+            println("Error adding news: ${e.localizedMessage}")
+            throw e
+        }
+    }
+
+    private fun numberToWords(n: Int): String {
+        val units = arrayOf(
+            "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten",
+            "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+        )
+        val tens = arrayOf(
+            "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"
+        )
+
+        return when {
+            n == 0 -> "Zero"
+            n < 20 -> units[n]
+            n < 100 -> tens[n / 10] + units[n % 10]
+            else -> n.toString() // Fallback
+        }
+    }
+
+    override suspend fun updateNews(news: News) {
+        if (news.id.isEmpty()) {
+            println("Error: Intentando actualizar noticia con ID vacío")
+            throw Exception("Invalid document reference. The news ID is empty.")
+        }
+        try {
+            val newsMap = hashMapOf(
+                "image" to news.image,
+                "title" to news.title,
+                "content" to news.content,
+                "description" to news.description,
+                "order" to news.order,
+                "source" to news.source,
+                "date" to news.date,
+                "id" to news.id
+            )
+            firestore.collection("news").document(news.id).update(newsMap as Map<String, Any>).await()
+        } catch (e: Exception) {
+            println("Error updating news ${news.id}: ${e.localizedMessage}")
+            throw e
+        }
+    }
+
+    override suspend fun deleteNews(newsId: String) {
+        try {
+            firestore.collection("news").document(newsId).delete().await()
+        } catch (e: Exception) {
+            println("Error deleting news $newsId: ${e.localizedMessage}")
+            throw e
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.colegiosociologosperu.cspmovillimacallao.domain.entities.user
 
 data class ProfileUiState(
+    val id: String = "",
     val name: String = "",
     val lastName: String = "",
     var email: String = "",

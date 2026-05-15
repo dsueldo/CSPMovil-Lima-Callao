@@ -3,8 +3,8 @@ package com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.aut
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.AuthRepository
-import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.UserProfileService
+import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.AuthUseCase
+import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.ProfileUseCase
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.CspAppViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -12,8 +12,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val userProfileService: UserProfileService
+    private val authUseCase: AuthUseCase,
+    private val profileUseCase: ProfileUseCase
 ) : CspAppViewModel() {
 
     private val _userRole = mutableStateOf<String?>(null)
@@ -29,9 +29,9 @@ class SplashViewModel @Inject constructor(
     fun checkUserStatus() {
         viewModelScope.launch {
             _isLoading.value = true
-            if (authRepository.hasUser()) {
+            if (authUseCase.hasUser()) {
                 try {
-                    val profile = userProfileService.getProfile()
+                    val profile = profileUseCase.getProfileData()
                     _userRole.value = profile.role
                 } catch (e: Exception) {
                     _userRole.value = "user" // Default if error
@@ -44,18 +44,18 @@ class SplashViewModel @Inject constructor(
     }
 
     fun hasUser(): Boolean {
-        return authRepository.hasUser()
+        return authUseCase.hasUser()
     }
 
-  fun signOut() {
-    viewModelScope.launch {
-      authRepository.signOut()
+    fun signOut() {
+        viewModelScope.launch {
+            authUseCase.signOut()
+        }
     }
-  }
 
-  fun deleteAccount() {
-    viewModelScope.launch {
-      authRepository.deleteAccount()
-      }
-  }
+    fun deleteAccount() {
+        viewModelScope.launch {
+            authUseCase.deleteAccount()
+        }
+    }
 }

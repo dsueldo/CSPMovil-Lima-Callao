@@ -18,7 +18,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.colegiosociologosperu.cspmovillimacallao.domain.entities.user.ProfileUiState
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.editprofile.EditProfileViewModel
@@ -29,6 +31,36 @@ fun EditProfileBody(
     viewModel: EditProfileViewModel,
 ) {
     val profileUiState by viewModel.profileUiState.collectAsState()
+
+    EditProfileBodyContent(
+        modifier = modifier,
+        profileUiState = profileUiState,
+        onUpdateName = { viewModel.updateName(it) },
+        onUpdateLastName = { viewModel.updateLastName(it) },
+        onUpdatePhone = { viewModel.updatePhoneNumber(it) },
+        onUpdateEmail = { viewModel.updateEmail(it) },
+        onUpdateGender = { viewModel.updateGender(it) },
+        onUpdateBirthday = { viewModel.updateBirthday(it) },
+        onUpdateDni = { viewModel.updateDni(it) },
+        onUpdateCodeNumber = { viewModel.updateCodeNumber(it) },
+        onUpdateSpecialized = { viewModel.updateSpecialized(it) }
+    )
+}
+
+@Composable
+fun EditProfileBodyContent(
+    modifier: Modifier = Modifier,
+    profileUiState: ProfileUiState,
+    onUpdateName: (String) -> Unit,
+    onUpdateLastName: (String) -> Unit,
+    onUpdatePhone: (String) -> Unit,
+    onUpdateEmail: (String) -> Unit,
+    onUpdateGender: (String) -> Unit,
+    onUpdateBirthday: (String) -> Unit,
+    onUpdateDni: (String) -> Unit,
+    onUpdateCodeNumber: (String) -> Unit,
+    onUpdateSpecialized: (String) -> Unit,
+) {
     var showBirthdayPicker by remember { mutableStateOf(false) }
 
     Column(
@@ -43,7 +75,7 @@ fun EditProfileBody(
 
         OutlinedTextField(
             value = profileUiState.name,
-            onValueChange = { viewModel.updateName(it) },
+            onValueChange = onUpdateName,
             label = { Text("Nombres") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
@@ -56,7 +88,7 @@ fun EditProfileBody(
 
         OutlinedTextField(
             value = profileUiState.lastName,
-            onValueChange = { viewModel.updateLastName(it) },
+            onValueChange = onUpdateLastName,
             label = { Text("Apellidos") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
@@ -71,7 +103,7 @@ fun EditProfileBody(
             value = profileUiState.phone,
             onValueChange = { phone ->
                 if (phone.length <= 9 && phone.all { it.isDigit() }) {
-                    viewModel.updatePhoneNumber(phone)
+                    onUpdatePhone(phone)
                 }
             },
             label = { Text("Celular") },
@@ -86,7 +118,7 @@ fun EditProfileBody(
 
         OutlinedTextField(
             value = profileUiState.email,
-            onValueChange = { viewModel.updateEmail(it) },
+            onValueChange = onUpdateEmail,
             label = { Text("Correo") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
@@ -99,13 +131,13 @@ fun EditProfileBody(
 
         GenderComponent(
             selectedGender = profileUiState.gender,
-            onGenderSelected = { viewModel.updateGender(it) }
+            onGenderSelected = onUpdateGender
         )
 
         if (showBirthdayPicker) {
             BirthdayComponent(
                 onDateSelected = { formattedDate ->
-                    viewModel.updateBirthday(formattedDate)
+                    onUpdateBirthday(formattedDate)
                     showBirthdayPicker = false
                 },
                 onDismiss = { showBirthdayPicker = false },
@@ -140,7 +172,7 @@ fun EditProfileBody(
             value = profileUiState.dni,
             onValueChange = { dni ->
                 if (dni.length <= 8 && dni.all { it.isDigit() }) {
-                    viewModel.updateDni(dni)
+                    onUpdateDni(dni)
                 }
             },
             label = { Text("DNI") },
@@ -157,7 +189,7 @@ fun EditProfileBody(
             value = profileUiState.codeNumber,
             onValueChange = { code ->
                 if (code.length <= 10 && code.all { it.isDigit() }) {
-                    viewModel.updateCodeNumber(code)
+                    onUpdateCodeNumber(code)
                 }
             },
             label = { Text("Número de Colegiatura") },
@@ -172,7 +204,7 @@ fun EditProfileBody(
 
         OutlinedTextField(
             value = profileUiState.specialized,
-            onValueChange = { viewModel.updateSpecialized(it) },
+            onValueChange = onUpdateSpecialized,
             label = { Text("Especialidad") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
@@ -183,4 +215,26 @@ fun EditProfileBody(
         
         Spacer(modifier = Modifier.height(16.dp))
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EditProfileBodyPreview() {
+    EditProfileBodyContent(
+        profileUiState = ProfileUiState(
+            name = "Christian",
+            lastName = "Quispe",
+            phone = "987654321",
+            email = "christian@example.com"
+        ),
+        onUpdateName = {},
+        onUpdateLastName = {},
+        onUpdatePhone = {},
+        onUpdateEmail = {},
+        onUpdateGender = {},
+        onUpdateBirthday = {},
+        onUpdateDni = {},
+        onUpdateCodeNumber = {},
+        onUpdateSpecialized = {}
+    )
 }
