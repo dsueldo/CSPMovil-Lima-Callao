@@ -12,11 +12,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.colegiosociologosperu.cspmovillimacallao.domain.entities.news.News
-import com.colegiosociologosperu.cspmovillimacallao.domain.entities.user.ProfileUiState
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.admin.components.AdminDrawerContent
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.NewsCard
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.NewsCardShimmer
@@ -52,6 +52,10 @@ fun NewsScreen(
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        viewModel.refreshNewsList()
+    }
 
     if (adminProfile?.role == "admin") {
         ModalNavigationDrawer(
@@ -122,6 +126,8 @@ fun NewsScreenContent(
     onFavoritesClick: () -> Unit,
     onAddNewsClick: () -> Unit = {}
 ) {
+    val pullToRefreshState = rememberPullToRefreshState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -175,9 +181,10 @@ fun NewsScreenContent(
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
                 onRefresh = onRefresh,
+                state = pullToRefreshState,
                 indicator = {
                     PullToRefreshDefaults.Indicator(
-                        state = rememberPullToRefreshState(),
+                        state = pullToRefreshState,
                         isRefreshing = isRefreshing,
                         containerColor = Color.White,
                         color = Red_Dark,
@@ -191,14 +198,17 @@ fun NewsScreenContent(
                         .background(MaterialTheme.colorScheme.background)
                         .fillMaxSize()
                 ) {
-                    if (isLoading && !isRefreshing) {
+                    if (isLoading && !isRefreshing && newsList.isEmpty()) {
                         items(5) {
                             NewsCardShimmer(
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                             )
                         }
                     } else {
-                        items(newsList) { news ->
+                        items(
+                            items = newsList,
+                            key = { it.id }
+                        ) { news ->
                             NewsCard(
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                                 news = news,

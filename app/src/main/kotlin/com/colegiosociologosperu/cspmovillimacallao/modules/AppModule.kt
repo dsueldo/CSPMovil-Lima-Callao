@@ -3,6 +3,7 @@ package com.colegiosociologosperu.cspmovillimacallao.modules
 import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.UserProfileService
 import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.BenefitsUseCase
 import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.NewsUseCase
+import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.PaymentsUseCase
 import com.colegiosociologosperu.cspmovillimacallao.domain.usecases.ProfileUseCase
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.benefits.BenefitsListViewModel
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.benefits.detail.BenefitsDetailViewModel
@@ -11,6 +12,7 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.fact
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.factories.NewsListViewModelFactory
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.news.NewsListViewModel
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.news.detail.NewsDetailViewModel
+import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.payment.PaymentsViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -43,4 +45,7 @@ object AppModule {
 
     @Provides
     fun provideBenefitsListViewModelFactory(useCase: BenefitsUseCase): BenefitsListViewModelFactory = BenefitsListViewModelFactory(useCase)
+
+    @Provides
+    fun providePaymentsViewModel(useCase: PaymentsUseCase): PaymentsViewModel = PaymentsViewModel(useCase)
 }

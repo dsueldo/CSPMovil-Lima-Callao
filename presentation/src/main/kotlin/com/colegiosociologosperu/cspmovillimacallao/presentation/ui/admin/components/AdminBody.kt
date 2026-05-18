@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,6 +22,7 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red
 fun AdminBody(
     users: List<ProfileUiState>,
     searchQuery: String,
+    isLoading: Boolean,
     onSearchQueryChange: (String) -> Unit,
     onUpdateUser: (uid: String, specialized: String, condition: String, payLastPeriod: String) -> Unit,
     modifier: Modifier = Modifier
@@ -37,6 +39,13 @@ fun AdminBody(
                 .padding(16.dp),
             placeholder = { Text("Buscar por nombre, DNI o código") },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+            trailingIcon = {
+                if (searchQuery.isNotEmpty()) {
+                    IconButton(onClick = { onSearchQueryChange("") }) {
+                        Icon(Icons.Default.Close, contentDescription = "Limpiar")
+                    }
+                }
+            },
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Red_Dark,
                 focusedLabelColor = Red_Dark,
@@ -50,20 +59,32 @@ fun AdminBody(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(users) { user ->
-                UserItem(
-                    user = user,
-                    onClick = {
-                        selectedUser = user
-                        showEditDialog = true
-                    }
-                )
-            }
-            
-            if (users.isEmpty() && searchQuery.isNotEmpty()) {
-                item {
-                    Box(modifier = Modifier.fillParentMaxSize(), contentAlignment = Alignment.Center) {
-                        Text("No se encontraron usuarios", color = Color.Gray)
+            if (isLoading && users.isEmpty()) {
+                items(10) {
+                    UserItemShimmer()
+                }
+            } else {
+                items(
+                    items = users,
+                    key = { it.id }
+                ) { user ->
+                    UserItem(
+                        user = user,
+                        onClick = {
+                            selectedUser = user
+                            showEditDialog = true
+                        }
+                    )
+                }
+
+                if (users.isEmpty() && searchQuery.isNotEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No se encontraron usuarios", color = Color.Gray)
+                        }
                     }
                 }
             }
@@ -103,21 +124,36 @@ fun UserEditDialog(
                     value = specialized,
                     onValueChange = { specialized = it },
                     label = { Text("Especialidad") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Red_Dark,
+                        focusedLabelColor = Red_Dark,
+                        cursorColor = Red_Dark
+                    )
                 )
                 
                 OutlinedTextField(
                     value = condition,
                     onValueChange = { condition = it },
                     label = { Text("Condición") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Red_Dark,
+                        focusedLabelColor = Red_Dark,
+                        cursorColor = Red_Dark
+                    )
                 )
                 
                 OutlinedTextField(
                     value = payLastPeriod,
                     onValueChange = { payLastPeriod = it },
                     label = { Text("Último Periodo Pagado") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Red_Dark,
+                        focusedLabelColor = Red_Dark,
+                        cursorColor = Red_Dark
+                    )
                 )
             }
         },
@@ -146,6 +182,7 @@ fun AdminBodyPreview() {
             ProfileUiState(name = "Juan", lastName = "Perez", dni = "87654321")
         ),
         searchQuery = "",
+        isLoading = false,
         onSearchQueryChange = {},
         onUpdateUser = { _, _, _, _ -> }
     )

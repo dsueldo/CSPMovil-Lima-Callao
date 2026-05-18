@@ -32,6 +32,9 @@ class AdminViewModel @Inject constructor(
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
     val filteredUsers = combine(_users, _searchQuery) { users, query ->
         if (query.isBlank()) {
             users
@@ -49,9 +52,13 @@ class AdminViewModel @Inject constructor(
         loadData()
     }
 
-    fun loadData() {
+    fun loadData(isRefresh: Boolean = false) {
         viewModelScope.launch {
-            _loading.value = true
+            if (isRefresh) {
+                _isRefreshing.value = true
+            } else {
+                _loading.value = true
+            }
             try {
                 val admin = profileUseCase.getProfileData()
                 _adminProfile.value = admin
@@ -60,6 +67,7 @@ class AdminViewModel @Inject constructor(
                 // Handle error
             } finally {
                 _loading.value = false
+                _isRefreshing.value = false
             }
         }
     }

@@ -3,10 +3,12 @@ package com.colegiosociologosperu.cspmovillimacallao.modules
 import com.colegiosociologosperu.cspmovillimacallao.data.repositories.AccountServiceImpl
 import com.colegiosociologosperu.cspmovillimacallao.data.repositories.BenefitsRepositoryImpl
 import com.colegiosociologosperu.cspmovillimacallao.data.repositories.NewsRepositoryImpl
+import com.colegiosociologosperu.cspmovillimacallao.data.repositories.PaymentsRepositoryImpl
 import com.colegiosociologosperu.cspmovillimacallao.data.repositories.UserProfileServiceImpl
 import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.AuthRepository
 import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.BenefitsRepository
 import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.NewsRepository
+import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.PaymentsRepository
 import com.colegiosociologosperu.cspmovillimacallao.domain.repositories.UserProfileService
 import dagger.Binds
 import dagger.Module
@@ -25,6 +27,9 @@ abstract class ServiceModule {
 
     @Binds
     abstract fun bindBenefitsRepository(benefitsRepositoryImpl: BenefitsRepositoryImpl): BenefitsRepository
+
+    @Binds
+    abstract fun bindPaymentsRepository(paymentsRepositoryImpl: PaymentsRepositoryImpl): PaymentsRepository
 
     @Binds
     abstract fun provideUserProvideService(userProfileServiceImpl: UserProfileServiceImpl): UserProfileService

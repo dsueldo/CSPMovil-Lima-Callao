@@ -16,6 +16,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -26,11 +27,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.colegiosociologosperu.cspmovillimacallao.domain.entities.payment.PaymentsItem
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.ItemPaymentComponent
 import com.colegiosociologosperu.cspmovillimacallao.presentation.ui.components.ItemPaymentShimmer
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Typography
-import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.payment.PaymentsItem
 import com.colegiosociologosperu.cspmovillimacallao.presentation.viewmodels.payment.PaymentsViewModel
 
 @Composable
@@ -42,6 +43,10 @@ fun PaymentOneScreen(
     val paymentsList by viewModel.paymentsList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.refreshPaymentsList()
+    }
 
     PaymentOneContent(
         paymentsList = paymentsList,
@@ -65,6 +70,8 @@ fun PaymentOneContent(
     onPaymentClick: (PaymentsItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val pullToRefreshState = rememberPullToRefreshState()
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -91,9 +98,10 @@ fun PaymentOneContent(
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
                 onRefresh = onRefresh,
+                state = pullToRefreshState,
                 indicator = {
                     PullToRefreshDefaults.Indicator(
-                        state = rememberPullToRefreshState(),
+                        state = pullToRefreshState,
                         isRefreshing = isRefreshing,
                         containerColor = Color.White,
                         color = Red_Dark,
@@ -108,12 +116,15 @@ fun PaymentOneContent(
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
                 ) {
-                    if (isLoading && !isRefreshing) {
+                    if (isLoading && !isRefreshing && paymentsList.isEmpty()) {
                         items(8) {
                             ItemPaymentShimmer()
                         }
                     } else {
-                        items(paymentsList) { paymentsItem ->
+                        items(
+                            items = paymentsList,
+                            key = { it.title }
+                        ) { paymentsItem ->
                             ItemPaymentComponent(
                                 image = paymentsItem.image,
                                 title = paymentsItem.title,

@@ -73,6 +73,10 @@ fun ProfileScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.refreshProfile()
+    }
+
     ProfileContent(
         profileState = profileState,
         isLoading = isLoading,
@@ -98,6 +102,7 @@ fun ProfileContent(
     onContact: () -> Unit
 ) {
     var showSignOutDialog by remember { mutableStateOf(false) }
+    val pullToRefreshState = rememberPullToRefreshState()
 
     if (showSignOutDialog) {
         AlertDialog(
@@ -165,9 +170,10 @@ fun ProfileContent(
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
                 onRefresh = onRefresh,
+                state = pullToRefreshState,
                 indicator = {
                     PullToRefreshDefaults.Indicator(
-                        state = rememberPullToRefreshState(),
+                        state = pullToRefreshState,
                         isRefreshing = isRefreshing,
                         containerColor = Color.White,
                         color = Red_Dark,
@@ -184,7 +190,7 @@ fun ProfileContent(
                         .padding(horizontal = 16.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    if (isLoading && !isRefreshing) {
+                    if (isLoading && !isRefreshing && profileState.name.isEmpty()) {
                         Box(modifier = Modifier.padding(vertical = 16.dp)) {
                             ProfileHeaderShimmer()
                         }

@@ -16,6 +16,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,6 +43,10 @@ fun BenefitsScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.refreshBenefitsList()
+    }
+
     BenefitsScreenContent(
         benefitsList = benefitsList,
         isLoading = isLoading,
@@ -62,6 +67,8 @@ fun BenefitsScreenContent(
     onRefresh: () -> Unit,
     onBenefitsClick: (Benefits) -> Unit
 ) {
+    val pullToRefreshState = rememberPullToRefreshState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -87,9 +94,10 @@ fun BenefitsScreenContent(
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
                 onRefresh = onRefresh,
+                state = pullToRefreshState,
                 indicator = {
                     PullToRefreshDefaults.Indicator(
-                        state = rememberPullToRefreshState(),
+                        state = pullToRefreshState,
                         isRefreshing = isRefreshing,
                         containerColor = Color.White,
                         color = Red_Dark,
@@ -103,14 +111,17 @@ fun BenefitsScreenContent(
                         .background(MaterialTheme.colorScheme.background)
                         .fillMaxSize()
                 ) {
-                    if (isLoading && !isRefreshing) {
+                    if (isLoading && !isRefreshing && benefitsList.isEmpty()) {
                         items(5) {
                             BenefitsCardShimmer(
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                             )
                         }
                     } else {
-                        items(benefitsList) { benefits ->
+                        items(
+                            items = benefitsList,
+                            key = { it.id }
+                        ) { benefits ->
                             BenefitsCard(
                                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                                 benefits = benefits,

@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -26,11 +27,40 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNewsScreen(
     navController: NavController,
     viewModel: AddNewsViewModel = hiltViewModel()
+) {
+    val isLoading by viewModel.isLoading.collectAsState()
+    val isSuccess by viewModel.isSuccess.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    LaunchedEffect(isSuccess) {
+        if (isSuccess) {
+            navController.popBackStack()
+            viewModel.resetState()
+        }
+    }
+
+    AddNewsScreenContent(
+        isLoading = isLoading,
+        error = error,
+        onBack = { navController.popBackStack() },
+        onAddNews = { imageUrl, title, description, content, source, date ->
+            viewModel.addNews(imageUrl, title, description, content, source, date)
+        }
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddNewsScreenContent(
+    isLoading: Boolean,
+    error: String?,
+    onBack: () -> Unit,
+    onAddNews: (String, String, String, String, String, String) -> Unit
 ) {
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
@@ -44,20 +74,9 @@ fun AddNewsScreen(
     val datePickerState = rememberDatePickerState()
     val timePickerState = rememberTimePickerState()
 
-    val isLoading by viewModel.isLoading.collectAsState()
-    val isSuccess by viewModel.isSuccess.collectAsState()
-    val error by viewModel.error.collectAsState()
-
     LaunchedEffect(Unit) {
         val now = LocalDateTime.now()
         date = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"))
-    }
-
-    LaunchedEffect(isSuccess) {
-        if (isSuccess) {
-            navController.popBackStack()
-            viewModel.resetState()
-        }
     }
 
     if (showDatePicker) {
@@ -150,7 +169,7 @@ fun AddNewsScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Regresar"
@@ -251,7 +270,7 @@ fun AddNewsScreen(
 
             if (error != null) {
                 Text(
-                    text = error ?: "",
+                    text = error,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -261,7 +280,7 @@ fun AddNewsScreen(
 
             Button(
                 onClick = {
-                    viewModel.addNews(imageUrl, title, description, content, source, date)
+                    onAddNews(imageUrl, title, description, content, source, date)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
@@ -283,3 +302,16 @@ fun AddNewsScreen(
         }
     }
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview(showBackground = true)
+@Composable
+fun AddNewsScreenPreview() {
+    AddNewsScreenContent(
+        isLoading = false,
+        error = null,
+        onBack = {},
+        onAddNews = { _, _, _, _, _, _ -> }
+    )
+}
+

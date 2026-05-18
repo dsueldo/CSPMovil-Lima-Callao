@@ -1,10 +1,10 @@
 package com.colegiosociologosperu.cspmovillimacallao.presentation.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Money
+import androidx.compose.material.icons.filled.Handshake
 import androidx.compose.material.icons.filled.Newspaper
-import androidx.compose.material.icons.filled.Work
 import kotlinx.serialization.Serializable
 
 @Serializable data object Splash
@@ -21,7 +21,7 @@ import kotlinx.serialization.Serializable
 
 val topLevelRoutes = listOf(
     TopLevelRoute("Noticias", "news", Icons.Filled.Newspaper),
-    TopLevelRoute("Convenios", "benefit", Icons.Filled.Work),
-    TopLevelRoute("Pagos", "payment", Icons.Filled.Money),
+    TopLevelRoute("Convenios", "benefit", Icons.Filled.Handshake),
+    TopLevelRoute("Pagos", "payment", Icons.Filled.CreditCard),
     TopLevelRoute("Perfil", "profile", Icons.Filled.Face),
 )

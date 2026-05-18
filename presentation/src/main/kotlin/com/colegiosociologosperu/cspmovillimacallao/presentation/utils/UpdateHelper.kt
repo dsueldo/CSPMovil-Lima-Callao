@@ -10,6 +10,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red_Dark
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.AppUpdateType
@@ -68,7 +69,7 @@ fun UpdateDialog(
     onDismiss: () -> Unit
 ) {
     AlertDialog(
-        onDismissRequest = { /* Force user to choose */ },
+        onDismissRequest = onDismiss,
         title = { Text("Actualización disponible") },
         text = { Text("Hay una nueva versión de la aplicación disponible en Play Store. ¿Deseas actualizar ahora?") },
         confirmButton = {
@@ -85,4 +86,10 @@ fun UpdateDialog(
             }
         }
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UpdateDialogPreview() {
+    UpdateDialog(onUpdate = {}, onDismiss = {})
 }

@@ -31,8 +31,6 @@ import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.theme.Red
 import com.colegiosociologosperu.cspmovillimacallao.presentation.R
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-
-import com.google.firebase.auth.FirebaseAuth
 import com.colegiosociologosperu.cspmovillimacallao.presentation.utils.CheckForUpdates
 
 @RequiresApi(Build.VERSION_CODES.O)
